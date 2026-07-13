@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AS 5131 Site Audit Tracker — Sun Metals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --zinc:#E9ECEE;
+    --surface:#FFFFFF;
+    --ink:#14181B;
+    --ink-2:#4A545C;
+    --ink-3:#7E8992;
+    --rule:#D2D8DC;
+    --dawsons:#A6192E;
+    --tape-none:#98A2AA;
+    --tape-pink:#D6386B;
+    --tape-yellow:#E5A700;
+    --tape-blue:#1E6FB8;
+    --shadow:0 1px 2px rgba(20,24,27,.06), 0 4px 16px rgba(20,24,27,.06);
+    --mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --cond:'Roboto Condensed', 'Arial Narrow', system-ui, sans-serif;
+    --body:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:var(--body);
+    background:var(--zinc);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.5;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+  header.mast{background:var(--ink);color:#fff;border-bottom:4px solid var(--dawsons)}
+  .mast-in{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;padding:20px 0 18px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8FA0AC;margin-bottom:6px}
+  h1{font-family:var(--cond);font-weight:700;font-size:30px;line-height:1.05;letter-spacing:.01em;text-transform:uppercase}
+  .sub{font-size:13px;color:#AEBDC7;margin-top:6px;max-width:62ch}
+  .countdown{font-family:var(--cond);text-align:right;line-height:1}
+  .countdown .n{font-size:44px;font-weight:700;display:block}
+  .countdown .l{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8FA0AC}
+  .idbar{background:#232A2F;color:#CBD5DB;border-bottom:1px solid #323C43}
+  .idbar-in{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:10px 0;font-size:13px}
+  .idbar input{font:inherit;background:#151A1E;border:1px solid #3C464D;color:#fff;padding:6px 10px;border-radius:3px;width:190px}
+  .idbar input:focus{outline:2px solid var(--tape-yellow);outline-offset:1px}
+  .who{font-family:var(--mono);font-size:12px;color:#8FA0AC}
+  .sync{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#7E8B94}
+  .sync.on{color:var(--tape-yellow)}
+  .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);margin:20px 0;border:1px solid var(--rule);box-shadow:var(--shadow)}
+  .stat{background:var(--surface);padding:14px 16px}
+  .stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+  .stat .v{font-family:var(--cond);font-size:32px;font-weight:700;line-height:1.1;margin-top:2px}
+  .stat.blocking .v{color:var(--dawsons)}
+  .bar{height:6px;background:var(--rule);margin-top:8px;overflow:hidden;border-radius:2px}
+  .bar span{display:block;height:100%;background:var(--tape-blue);transition:width .4s ease}
+  .filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
+  .chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--surface);border:1px solid var(--rule);color:var(--ink-2);padding:7px 11px;border-radius:2px;cursor:pointer}
+  .chip:hover{border-color:var(--ink-3)}
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip.crit[aria-pressed="true"]{background:var(--dawsons);border-color:var(--dawsons)}
+  .filters .spacer{flex:1}
+  section.blk{background:var(--surface);border:1px solid var(--rule);margin-bottom:12px;box-shadow:var(--shadow)}
+  .blk-h{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:13px 16px;cursor:pointer;font:inherit}
+  .blk-h:hover{background:#F6F8F9}
+  .blk-n{font-family:var(--mono);font-size:11px;color:var(--ink-3);min-width:22px}
+  .blk-t{font-family:var(--cond);font-weight:600;font-size:17px;letter-spacing:.01em;flex:1}
+  .blk-c{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+  .blk-c b{color:var(--dawsons)}
+  .caret{color:var(--ink-3);transition:transform .18s ease;font-size:12px}
+  .blk[data-open="false"] .caret{transform:rotate(-90deg)}
+  .blk[data-open="false"] .blk-body{display:none}
+  .note{background:#FFF8E3;border-left:3px solid var(--tape-yellow);padding:10px 14px;font-size:13px;color:#4A3D14}
+  .item{display:flex;border-top:1px solid var(--rule)}
+  .item:first-child{border-top:0}
+  .tape{width:6px;flex:none;background:var(--tape-none)}
+  .item[data-s="progress"] .tape{background:var(--tape-yellow)}
+  .item[data-s="hold"]     .tape{background:var(--tape-pink)}
+  .item[data-s="closed"]   .tape{background:var(--tape-blue)}
+  .item-in{flex:1;min-width:0;padding:12px 14px}
+  .item-top{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
+  .ref{font-family:var(--mono);font-size:12px;color:var(--ink-3);min-width:38px;padding-top:1px}
+  .txt{flex:1;min-width:0;font-size:14px}
+  .item[data-crit="1"] .txt{font-weight:600}
+  .flag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;background:var(--dawsons);color:#fff;padding:1px 5px;border-radius:2px;margin-right:6px;vertical-align:1px}
+  .clause{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:4px}
+  .pill{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:2px;white-space:nowrap;flex:none;background:#EDF0F2;color:var(--ink-2);border:1px solid var(--rule)}
+  .item[data-s="progress"] .pill{background:#FFF4D6;color:#7A5B00;border-color:#F0D998}
+  .item[data-s="hold"]     .pill{background:#FDE7EE;color:#96153F;border-color:#F4C0D2}
+  .item[data-s="closed"]   .pill{background:#E1EEF9;color:#155189;border-color:#B9D6EE}
+  .detail{display:none;padding:12px 0 4px 50px}
+  .item[data-open="1"] .detail{display:block}
+  .log{list-style:none;margin-bottom:10px}
+  .log li{border-left:2px solid var(--rule);padding:6px 0 6px 12px;margin-bottom:6px}
+  .log li.s-progress{border-color:var(--tape-yellow)}
+  .log li.s-hold{border-color:var(--tape-pink)}
+  .log li.s-closed{border-color:var(--tape-blue)}
+  .log .meta{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-bottom:2px}
+  .log .meta b{color:var(--ink-2)}
+  .log .body{font-size:13.5px;white-space:pre-wrap}
+  .evidence-tag{margin-top:4px;font-size:12px;font-family:var(--mono);background:#E1EEF9;display:inline-block;padding:2px 6px;border-radius:3px;color:#155189}
+  .evidence-tag a{color:#155189;font-weight:600;text-decoration:underline}
+  .empty{font-size:13px;color:var(--ink-3);font-style:italic;margin-bottom:10px}
+  textarea{font:inherit;font-size:14px;width:100%;min-height:64px;resize:vertical;border:1px solid var(--rule);border-radius:2px;padding:9px 11px;background:#FBFCFC}
+  textarea:focus{outline:2px solid var(--tape-blue);outline-offset:-1px;background:#fff}
+  .evidence-input{margin-top:8px;font-size:13px;width:100%;padding:6px 10px;border:1px solid var(--rule);border-radius:2px;background:#FBFCFC}
+  .acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+  .btn{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);padding:8px 12px;border-radius:2px;cursor:pointer}
+  .btn:hover:not(:disabled){border-color:var(--ink-3);color:var(--ink)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.prog[aria-disabled="false"]:hover{background:#FFF4D6;border-color:var(--tape-yellow)}
+  .btn.hold:hover:not(:disabled){background:#FDE7EE;border-color:var(--tape-pink)}
+  .btn.close{background:var(--tape-blue);border-color:var(--tape-blue);color:#fff}
+  .btn.close:hover:not(:disabled){background:#155189}
+  .btn.print{background:var(--dawsons);border-color:var(--dawsons);color:#fff}
+  .btn.print:hover{background:#801020;border-color:#801020}
+  .btn.reopen{margin-left:auto}
+  .hint{font-size:12px;color:var(--ink-3);flex-basis:100%}
+  .hint.block{color:var(--dawsons);font-weight:500}
+  footer{padding:24px 0;font-size:12px;color:var(--ink-3);text-align:center;line-height:1.7}
+  footer b{color:var(--ink-2)}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,90px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:3px;font-family:var(--mono);font-size:12px;letter-spacing:.05em;box-shadow:0 6px 24px rgba(0,0,0,.25);transition:transform .25s ease;z-index:50}
+  .toast.up{transform:translate(-50%,0)}
+  .toast.err{background:var(--dawsons)}
+  @media (max-width:760px){
+    .dash{grid-template-columns:1fr 1fr}
+    h1{font-size:23px}
+    .countdown{text-align:left}
+    .detail{padding-left:0}
+    .item-top{flex-wrap:wrap}
+  }
+
+  /* ---------- Clean Print Layout Rules ---------- */
+  @media print {
+    body { background: #fff; color: #000; padding-bottom: 0; }
+    .mast, .idbar, .filters, textarea, .evidence-input, .acts, .toast, footer, .caret { display: none !important; }
+    .wrap { max-width: 100%; width: 100%; padding: 0; }
+    .dash { background: #fff; border: 2px solid #000; box-shadow: none; margin-top: 0; }
+    .stat { background: #fff; border: 1px solid #ddd; }
+    .stat.blocking .v { color: #000 !important; }
+    .bar { display: none; }
+    section.blk { page-break-inside: avoid; border: 2px solid #333; margin-bottom: 20px; }
+    .blk-body { display: block !important; }
+    .detail { display: block !important; padding-left: 20px; }
+    .item { page-break-inside: avoid; border-top: 1px solid #999; }
+    .tape { border-right: 4px solid #333; }
+  }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap mast-in">
+    <div>
+      <div class="eyebrow">Steel Compliance Australia &nbsp;·&nbsp; Auditor: Ankur</div>
+      <h1>AS 5131 Site Audit — Sun Metals</h1>
+      <div class="sub">Live close-out tracker. Copy and paste network file paths or shared drive links as verification evidence. Use the Filter options below to filter specific views, then hit "Print Report".</div>
+    </div>
+    <div class="countdown">
+      <span class="n" id="cdN">—</span>
+      <span class="l" id="cdL">to audit</span>
+    </div>
+  </div>
+</header>
+
+<div class="idbar">
+  <div class="wrap idbar-in">
+    <label for="who" class="who">Your name</label>
+    <input id="who" placeholder="e.g. Brad W" autocomplete="off">
+    <span class="who" id="whoNote">Everyone sharing this link sees the same entries.</span>
+    <span class="sync" id="sync">Loading…</span>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="dash">
+    <div class="stat"><div class="k">Items</div><div class="v" id="sTotal">0</div></div>
+    <div class="stat blocking"><div class="k">Critical still open</div><div class="v" id="sCrit">0</div></div>
+    <div class="stat"><div class="k">On hold</div><div class="v" id="sHold">0</div></div>
+    <div class="stat">
+      <div class="k">Closed out</div>
+      <div class="v" id="sClosed">0</div>
+      <div class="bar"><span id="sBar" style="width:0%"></span></div>
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="chip" data-f="all" aria-pressed="true">All</button>
+    <button class="chip crit" data-f="crit" aria-pressed="false">Critical only</button>
+    <button class="chip" data-f="open" aria-pressed="false">Not started</button>
+    <button class="chip" data-f="progress" aria-pressed="false">In progress</button>
+    <button class="chip" data-f="hold" aria-pressed="false">On hold</button>
+    <button class="chip" data-f="closed" aria-pressed="false">Closed</button>
+    <span class="spacer"></span>
+    <button class="chip print" id="printReportButton">🖨️ Print Report</button>
+    <button class="chip" id="expandAll">Expand all</button>
+    <button class="chip" id="collapseAll">Collapse all</button>
+  </div>
+
+  <div id="list"></div>
+</main>
+
+<footer class="wrap">
+  <b>DAW-TSV-CHK-001 · Rev 1</b> — clause references verified against AS/NZS 5131:2016.<br>
+  Entries are shared with everyone who has this link. Don't put anything in here you wouldn't hand to the auditor.
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const BUCKET = 'as5131-sunmetals-dawsons-2026'; 
+const API_URL = `https://kvdb.io/MN94Xg41mX74m8Z5aP5JvC/${BUCKET}`;
+const NAMEKEY = 'as5131-my-name';
+const AUDIT = new Date('2026-07-16T08:00:00+10:00');
+
+const DATA = [
+ {n:'1', t:'Construction Category — settle this first', note:'The CC (CC1–CC4) drives nearly everything else. It is a risk-based classification from Appendix C and must come off the Sun Metals construction specification. It is NOT the same as the Dawsons Project Category in IMS010 6.3.', items:[
+  {r:'1.1', c:1, x:'Construction Category (CC1/CC2/CC3/CC4) confirmed from the construction spec and written on the ITP', k:'Cl 4.1; App C'},
+  {r:'1.2', c:1, x:'Functional tolerance Class (1 or 2) confirmed from the spec. If the spec is silent, Class 1 applies by default.', k:'Cl 12.1'},
+  {r:'1.3', c:1, x:'Coating Quality Level (PC1 or PC2) confirmed — separate axis from CC', k:'Cl 9.2.1'}
+ ]},
+ {n:'2', t:'Blockers — the four that will bite', note:'Each of these is something Ankur told Brad he will ask for. If one cannot be closed, we need a written position ready, not a shrug.', items:[
+  {r:'2.1', c:1, x:'Torque wrench calibration. Two different requirements: anchors need a calibrated wrench recalibrated at intervals not exceeding 12 months (8.8.7); inspection wrenches must be calibrated at least once per shift against a bolt-tension device (App H2).', k:'Cl 8.8.7; App H2'},
+  {r:'2.2', c:1, x:'Rigging gear is GREEN, current period is BLUE. Bullivants cannot test before Thursday. Need written confirmation of the Sun Metals two-week grace period on site, plus the rigging register.', k:'Cl 11.2.5'},
+  {r:'2.3', c:1, x:'Lift plan / lift study from Townsville Cranes for the 60T slew. Confirm which crane is coming so the charts match the plan.', k:'Cl 11.2.5'},
+  {r:'2.4', c:1, x:'EWP hire company identified; registration certificate obtained and logbook travelling with the unit.', k:'Cl 11.2.5'},
+  {r:'2.5', c:1, x:'Is Andy welding on Thursday? If yes, Courtney to supply current welder qualification certificates and the site WPS.', k:'Sec 7; Cl 13.6'}
+ ]},
+ {n:'3', t:'Site planning documentation', items:[
+  {r:'3.1', c:1, x:'Erection plan (required — this is high risk construction work)', k:'Cl 11.2.1'},
+  {r:'3.2', c:0, x:'Quality documentation per Cl 4.5.1 in place (all CC except CC1)', k:'Cl 11.2.2; 4.5.1'},
+  {r:'3.3', c:1, x:'Quality Plan — mandatory for CC3/CC4 and for Coating Level PC2. For CC2 only if the spec calls for it.', k:'Cl 4.5.2; App E'},
+  {r:'3.4', c:1, x:'Work Method Statement prepared before erection starts and made available to all personnel. Should include erection drawings and temporary bracing details.', k:'Cl 11.2.3'},
+  {r:'3.5', c:1, x:'Risk assessment completed before erection commences, documented, available to all personnel', k:'Cl 11.2.4'},
+  {r:'3.6', c:1, x:'Erection Sequence Methodology prepared and REVIEWED BY A COMPETENT PERSON', k:'Cl 11.5.1'},
+  {r:'3.7', c:0, x:'Current IFC erection drawings on site; superseded revisions removed', k:'Cl 11.7'},
+  {r:'3.8', c:0, x:'Sun Metals permits approved and displayed', k:'Client req'}
+ ]},
+ {n:'4', t:'Lifting equipment & personnel — Cl 11.2.5', note:'This one clause is exactly what Ankur described on the phone. Five separate obligations. He will test each.', items:[
+  {r:'4.1', c:1, x:'Documented safe operation procedure, lift studies, lifting maps and sequencing diagrams for large or complex lifts', k:'Cl 11.2.5'},
+  {r:'4.2', c:1, x:'Proof of registration available for all registrable lifting equipment (crane, EWP, Franna)', k:'Cl 11.2.5'},
+  {r:'4.3', c:1, x:'Documented maintenance and inspection records for all lifting equipment', k:'Cl 11.2.5'},
+  {r:'4.4', c:0, x:'Lifting equipment installed and commissioned by a competent person', k:'Cl 11.2.5'},
+  {r:'4.5', c:1, x:'Current high risk licences held and available for inspection on the day', k:'Cl 11.2.5'},
+  {r:'4.6', c:1, x:'Lifting gear register and harness register on site, current and complete', k:'Cl 11.2.5'},
+  {r:'4.7', c:0, x:'Tags on all slings, shackles, chains — legible and in date', k:'Cl 11.2.5'},
+  {r:'4.8', c:0, x:'Townsville Cranes rigging tagged, register available, crane registration provided', k:'Cl 11.2.5; 4.6'},
+  {r:'4.9', c:1, x:'Daily pre-start / plant check reports completed for Thursday, all plant in use', k:'Cl 11.2.5'},
+  {r:'4.10',c:0, x:'Steelwork made safe against erection loading — equipment, stacked materials, and wind', k:'Cl 11.2.1'}
+ ]},
+ {n:'5', t:'Fasteners — materials & documentation', items:[
+  {r:'5.1', c:1, x:'Fastener certificates and packaging checked against the spec and Cl 5.5/5.6. Inadequate documentation = the fastener is NONCONFORMING until compliance is established.', k:'Cl 13.7.4'},
+  {r:'5.2', c:0, x:'Marking on supplied fasteners checked against the product Standard', k:'Cl 13.7.4'},
+  {r:'5.3', c:0, x:'Bolt assemblies kept intact until installation', k:'Cl 8.2.1'},
+  {r:'5.4', c:1, x:'Fasteners in closed containers at the point of installation. Only the number needed taken out; unused returned to protected storage.', k:'Cl 8.2.5; 11.5.6'},
+  {r:'5.5', c:0, x:'Bolt length correct — one clear thread above the nut, one thread plus run-out below after snug', k:'Cl 8.2.2'},
+  {r:'5.6', c:0, x:'Nuts run freely by hand; nut markings visible after installation', k:'Cl 8.2.3'},
+  {r:'5.7', c:0, x:'One washer under the part rotated during tightening', k:'Cl 8.2.4'},
+  {r:'5.8', c:1, x:'Bolts and nuts NOT welded (except stud bolts to AS/NZS 1554.2)', k:'Cl 8.2.1'},
+  {r:'5.9', c:1, x:'Pre-installation visual check of bolts for cracks, thread damage, loss of lubrication', k:'Cl 13.7.6'}
+ ]},
+ {n:'6', t:'Bolt tensioning — read before Thursday', note:'AS 5131 does NOT permit torque as a tensioning method. Cl 8.5.5: tension is achieved by part-turn (8.5.6) OR a direct-tension indicating device (8.5.7). A torque wrench is only for tightening anchors (8.8.7) and for INSPECTION to detect gross under-tensioning (13.7.8 Note 2 / App H). If any of the crew think they torque bolts to tension, that needs fixing before he arrives.', items:[
+  {r:'6.1', c:1, x:'Crew briefed: we do NOT torque bolts to tension. Everyone can say which method we use.', k:'Cl 8.5.5'},
+  {r:'6.2', c:1, x:'Tensioning method identified and correct — part-turn or DTI', k:'Cl 8.5.5'},
+  {r:'6.3', c:1, x:'All bolts to be tensioned first brought to snug-tight per Cl 8.3', k:'Cl 8.5.2'},
+  {r:'6.4', c:1, x:'Part-turn: location marks established after snug to control final nut rotation. Permanent where the spec requires them for later inspection.', k:'Cl 8.5.6(a)'},
+  {r:'6.5', c:1, x:'Part-turn: nut rotated by the amount in Table 8.5.6 (1/3 turn up to 1 full turn, by bolt length and face disposition)', k:'Table 8.5.6'},
+  {r:'6.6', c:1, x:'Minimum bolt tension per Table 8.5.5 — M16: 95kN · M20: 145kN · M24: 210kN · M30: 335kN · M36: 490kN', k:'Table 8.5.5'},
+  {r:'6.7', c:1, x:'Re-tensioning permitted ONCE only, same hole, same grip. Never reuse a tensioned bolt in another hole.', k:'Cl 8.5.4'},
+  {r:'6.8', c:1, x:'For CC2/3/4 — installation of mechanical fasteners supervised by a competent person', k:'Cl 8.9'},
+  {r:'6.9', c:0, x:'Tensioning done only by competent personnel; proceeds from the most rigid part toward free edges', k:'Cl 8.5.1; 8.5.3'},
+  {r:'6.10',c:0, x:'IMS010 marker convention (line = snug, cross = tensioned) actually applied to erected connections', k:'IMS010 9.7.7.3/4'}
+ ]},
+ {n:'7', t:'Contact surfaces & ply gaps', items:[
+  {r:'7.1', c:1, x:'Final gap between plies: snug-tight ≤2 mm; TENSIONED ≤1 mm', k:'Cl 8.2.1'},
+  {r:'7.2', c:1, x:'Packers/shims minimum 2 mm thick; maximum of THREE used', k:'Cl 8.2.1'},
+  {r:'7.3', c:0, x:'Burrs ≤1.5 mm may remain. Anything larger ground back to ≤1.5 mm.', k:'Cl 8.4.1'},
+  {r:'7.4', c:1, x:'Friction-type: contact surfaces free from paint, lacquer, galvanizing — unless tested to establish the friction coefficient (App G / RCSC / EN 1090-2)', k:'Cl 8.4.2'},
+  {r:'7.5', c:1, x:'Friction-type: coating INCLUDING OVERSPRAY excluded closer than one bolt diameter to any hole, and not less than 25 mm from the hole edge, and from all areas in the bolt group', k:'Cl 8.4.2'},
+  {r:'7.6', c:0, x:'Spec states whether friction-type surfaces are to be coated and with what', k:'Cl 8.4.2'}
+ ]},
+ {n:'8', t:'Mechanical & chemical anchors', items:[
+  {r:'8.1', c:1, x:'Anchor details (manufacturer, designation, embedment) in the spec. No substitution without written authorisation.', k:'Cl 8.8.1'},
+  {r:'8.2', c:1, x:'Installed strictly to the manufacturer’s written instructions; correct setting tool and cleaning accessories', k:'Cl 8.8.2; 8.8.4'},
+  {r:'8.3', c:1, x:'Hole tolerances: location ±1.5 mm, depth 0/+5 mm. Depth gauges used.', k:'Cl 8.8.5'},
+  {r:'8.4', c:1, x:'Chemical anchors: full curing time observed, undisturbed, before any tightening or loading', k:'Cl 8.8.6'},
+  {r:'8.5', c:1, x:'Calibrated torque wrench used to the manufacturer’s specified torque. Wrenches recalibrated at intervals not exceeding 12 months.', k:'Cl 8.8.7'},
+  {r:'8.6', c:1, x:'No shortening, adapting or modifying anchors. No mixing of products from different manufacturers.', k:'Cl 8.8.8'},
+  {r:'8.7', c:1, x:'Drilling through reinforcement not permitted without authorisation. Strike rebar → stop drilling immediately.', k:'Cl 8.8.10'},
+  {r:'8.8', c:0, x:'Installation by competent personnel (AEFAC certification or supplier training)', k:'Cl 8.8.3'},
+  {r:'8.9', c:0, x:'Resin within shelf life; not used if it won’t flow or packaging is leaking', k:'Cl 8.8.9'}
+ ]},
+ {n:'9', t:'Inspection of mechanical fastening — Cl 13.7', items:[
+  {r:'9.1', c:1, x:'ITP for mechanical fastening prepared (required for all CC except CC1), covering the eleven items in Cl 13.7.1(a)–(k)', k:'Cl 13.7.1'},
+  {r:'9.2', c:1, x:'ITP nominates WHO inspects, at what STAGE, which CONNECTIONS, and the METHOD AND EXTENT', k:'Cl 13.7.1'},
+  {r:'9.3', c:1, x:'Post-snug inspection: bolts in position; correct grade and size; thread extension correct; locking devices fitted; plies correct thickness', k:'Cl 13.7.7'},
+  {r:'9.4', c:1, x:'Visual check that nuts cannot be turned without a spanner. Inconclusive → physical check.', k:'Cl 13.7.7'},
+  {r:'9.5', c:1, x:'Connection inspected at the snug-tight stage BEFORE tensioning commences', k:'Cl 13.7.8'},
+  {r:'9.6', c:1, x:'Friction-type contact surfaces visually inspected BEFORE assembly. Assembly does not proceed until they comply and are re-inspected.', k:'Cl 13.7.8'},
+  {r:'9.7', c:1, x:'Post-tensioning inspection for CC2/3/4: part-turn measured or observed; or DTI reading exceeding Table 8.5.5', k:'Cl 13.7.8'},
+  {r:'9.8', c:1, x:'Sampling plan for inspection of tensioned bolts complies with ISO 2859-5 principles, unless the spec says otherwise', k:'Cl 13.7.8'},
+  {r:'9.9', c:1, x:'Inspection reports record: inspector name, item ID, date, requirement inspected against, and result', k:'Cl 13.7.3'},
+  {r:'9.10',c:0, x:'Inspection by a competent person (trade qualification + 10 years installing mechanical fasteners)', k:'Cl 13.7.2'}
+ ]},
+ {n:'10', t:'If a torque wrench is used for inspection — Appendix H', note:'Appendix H is INFORMATIVE. Cl 13.7.8 Note 2: a torque wrench is "suitable only to detect gross under-tensioning". Don’t present it as the primary verification if part-turn or DTI is the specified method.', items:[
+  {r:'10.1',c:1, x:'Inspection wrench calibrated AT LEAST ONCE PER SHIFT. The calibration value cannot be transferred to another wrench.', k:'App H2'},
+  {r:'10.2',c:1, x:'Job inspection torque set from at least three bolts in a bolt-tension calibrating device, tensioned to 1.05 × minimum bolt tension, measuring the torque to turn the nut 5°', k:'App H2'},
+  {r:'10.3',c:0, x:'Sample size: 10% of bolts, but not less than two bolts in each connection', k:'App H3'},
+  {r:'10.4',c:1, x:'If any nut turns under the job inspection torque, that torque is applied to ALL bolts in the connection and every one that turns is re-tensioned and re-inspected', k:'App H4'}
+ ]},
+ {n:'11', t:'Site survey & supports', items:[
+  {r:'11.1',c:1, x:'All setting out by competent personnel. All surveys DOCUMENTED AND VERIFIED.', k:'Cl 11.3'},
+  {r:'11.2',c:1, x:'Reference temperature of 20°C used for setting out and measuring', k:'Cl 11.3; 13.11.4'},
+  {r:'11.3',c:1, x:'Deviations in footing position/level measured against the setting-out system. Any rectification documented in a DETAILED WRITTEN PROCEDURE.', k:'Cl 11.3'},
+  {r:'11.4',c:1, x:'Supports, anchor bolts and bearings checked by DOCUMENTED SURVEY and DOCUMENTED VISUAL EXAMINATION before erection starts', k:'Cl 11.6.1'},
+  {r:'11.5',c:1, x:'Anchor bolt threads and nuts protected. Nuts run up to check they run freely BEFORE the member is erected.', k:'Cl 11.6.2'},
+  {r:'11.6',c:0, x:'Cast-in bolts in sleeves: sleeve 3× bolt dia, min 75 mm, depth ≤ half embedment', k:'Cl 11.6.2'},
+  {r:'11.7',c:1, x:'Shims left in place only if the spec allows — then same material, same corrosion protection, grouted with min 25 mm cover', k:'Cl 11.6.3'},
+  {r:'11.8',c:0, x:'Grout completely fills the space; placed under pressure or rammed; vent holes provided', k:'Cl 11.6.4'}
+ ]},
+ {n:'12', t:'Erection process', items:[
+  {r:'12.1',c:1, x:'Bracing and propping installed per the ESM unless prior WRITTEN approval from a competent person', k:'Cl 11.5.4'},
+  {r:'12.2',c:1, x:'Temporary supports not moved, removed or modified without prior WRITTEN approval. Damaged supports reported.', k:'Cl 11.5.4'},
+  {r:'12.3',c:1, x:'Before removing any brace or prop: structure inspected by a competent person, and WRITTEN APPROVAL obtained', k:'Cl 11.5.5'},
+  {r:'12.4',c:1, x:'Hole alignment: drift pin passes freely, perpendicular. No distortion, no hole enlargement.', k:'Cl 11.5.7'},
+  {r:'12.5',c:1, x:'NO hand flame cutting of bolt holes — except as site rectification for column base plates', k:'Cl 11.5.7'},
+  {r:'12.6',c:1, x:'Site welding: return earth connections made LOCAL to the area being welded; welding current does not damage members it passes through', k:'Cl 11.5.7'},
+  {r:'12.7',c:0, x:'Misalignment corrected by reaming or hollow milling cutter, checked against Cl 6.7', k:'Cl 11.5.7'},
+  {r:'12.8',c:0, x:'Permanent connections not made until enough of the structure is aligned, plumbed and temporarily connected', k:'Cl 11.5.7'},
+  {r:'12.9',c:0, x:'Members handled so no surface abrasion, damage or permanent deformation. Slings with softeners on coated steel.', k:'Cl 11.5.6; 9.9.19'}
+ ]},
+ {n:'13', t:'Geometrical tolerances — Section 12 & Appendix F', note:'Two different things. ESSENTIAL tolerances apply always, with no class. FUNCTIONAL tolerances have Class 1 and Class 2. Where the spec is silent, CLASS 1 APPLIES. Cl 12.1’s note only says Class 2 "should be considered" for CC3/CC4 — IMS010 turns that into a rule, which is our convention, not the standard’s.', items:[
+  {r:'13.1',c:1, x:'Check sheets quote the class actually specified for Sun Metals — not an assumed one', k:'Cl 12.1'},
+  {r:'13.2',c:0, x:'Column position at base — Essential 6 mm · Functional Class 1: 10 mm · Class 2: 5 mm', k:'Table F3.3'},
+  {r:'13.3',c:0, x:'Column level at base — Essential 10 mm · Functional Class 1 and 2: 5 mm', k:'Table F3.3'},
+  {r:'13.4',c:0, x:'Inclination of single storey column — Essential h/500 · Class 1: h/300 · Class 2: h/500', k:'Table F3.3'},
+  {r:'13.5',c:1, x:'Essential tolerance nonconformance SHALL BE CORRECTED (unless explicitly included in a revised design capacity calculation)', k:'Cl 12.3'},
+  {r:'13.6',c:1, x:'Measurement methods from ISO 7976-1/2; accuracy per ISO 17123; corrected for temperature', k:'Cl 13.11.4'},
+  {r:'13.7',c:0, x:'All measuring equipment calibrated and current', k:'IMS010 8.3'}
+ ]},
+ {n:'14', t:'Inspection of erection — Cl 13.11', items:[
+  {r:'14.1',c:1, x:'ITP covers the PRE-erection checks: anchor bolt locations and tolerances; connection points to existing structure; trial erection; survey points and grids; levels at all anchor bolt locations', k:'Cl 13.11.1(a)–(e)'},
+  {r:'14.2',c:1, x:'ITP covers the POST-erection checks: assembly per drawings and App F; alignment; distorted members; ALL temporary attachments removed and areas repaired; fastening inspected per 13.7; site welds per 13.6; condition of corrosion protection; grouting; anchor bolts and bearings', k:'Cl 13.11.1(i)–(xiii)'},
+  {r:'14.3',c:1, x:'Survey of the completed structure related to site survey marks and grid system', k:'Cl 13.11.4'},
+  {r:'14.4',c:1, x:'Inspection reports record: competent person name, item ID, date, requirement, result', k:'Cl 13.11.3'},
+  {r:'14.5',c:0, x:'Inspection by a competent person (trade qualification + 10 years in structural steel erection)', k:'Cl 13.11.2'},
+  {r:'14.6',c:0, x:'Nonconformance and concession procedures in use (IMS009_FRM001 / FRM002)', k:'Cl 4.5.1; IMS010 8.4'}
+ ]},
+ {n:'15', t:'Site modifications — Section 14', note:'The clause most likely to catch us if anything gets cut, drilled or re-welded on the day. Cl 14.2 is absolute.', items:[
+  {r:'15.1',c:1, x:'NO site modification to any member, connection component, fastener, weld or coating without a DETAILED WRITTEN PROCEDURE from a competent person', k:'Cl 14.2'},
+  {r:'15.2',c:1, x:'Damaged elements assessed and repaired to in-service requirements. Repair APPROVED BY A COMPETENT PERSON (our route: FRM004 Technical Query).', k:'Cl 11.1; IMS010 10'},
+  {r:'15.3',c:1, x:'Before site welding: coatings cleaned off for 50 mm EACH SIDE of the outside lines of the weld', k:'Cl 14.5'},
+  {r:'15.4',c:1, x:'Heat straightening (if used): max 590°C for quenched & tempered, 620°C other. NO accelerated cooling.', k:'Cl 14.7'},
+  {r:'15.5',c:0, x:'Structural members not removed or reduced in size unless documented', k:'Cl 14.3'}
+ ]},
+ {n:'16', t:'Materials & coating condition on site', items:[
+  {r:'16.1',c:1, x:'Identification visible after surface preparation and after painting or galvanizing', k:'Cl 6.2; 9.2.4'},
+  {r:'16.2',c:1, x:'75 mm wide weld margin left uncoated at site welds and masked', k:'Cl 9.9.9'},
+  {r:'16.3',c:0, x:'Traceability back to mill test certificates maintained', k:'Cl 4.7; 6.2'},
+  {r:'16.4',c:0, x:'Steel stored on dunnage, clear of the ground, protected from coating abrasion', k:'Cl 9.9.19; 11.5.6'},
+  {r:'16.5',c:0, x:'Damage to painted or galvanized surfaces repaired per Cl 9.12', k:'Cl 11.5.6'}
+ ]},
+ {n:'17', t:'Safety of the works & PPE', items:[
+  {r:'17.1',c:1, x:'Safety glasses on everyone. No exceptions while he is on site.', k:'Cl 4.5.3; WHS'},
+  {r:'17.2',c:1, x:'Double eye protection where required (grinding, cutting)', k:'WHS'},
+  {r:'17.3',c:1, x:'Gloves worn', k:'WHS'},
+  {r:'17.4',c:1, x:'Welding fume control considered — especially welding through paints, primers and coatings (AS 1674.1/1674.2)', k:'Cl 4.5.3(a)'},
+  {r:'17.5',c:1, x:'Crew briefed at pre-start: the audit, PPE, their WPS, and being able to say what they are working to', k:'—'},
+  {r:'17.6',c:0, x:'Site inductions complete for all Dawsons personnel and subcontractors', k:'Client req'}
+ ]},
+ {n:'18', t:'Registers — know where they live', items:[
+  {r:'18.1',c:0, x:'Electrical Test and Tag Register: \\\\192.168.6.6\\Dawsons_tsv\\Production\\Safety\\Electrical Test and Tag Register', k:'IMS003'},
+  {r:'18.2',c:0, x:'Welding Machine Calibrations: \\\\192.168.6.6\\Dawsons_tsv\\Production\\QA TSV WORKSHOP\\Calibrations\\Welding Machines', k:'IMS010 9.7.9'},
+  {r:'18.3',c:0, x:'Calibration Verification Register — TRON QA module', k:'IMS010 8.3'},
+  {r:'18.4',c:0, x:'Lifting gear and harness registers accessible on site', k:'Cl 11.2.5'},
+  {r:'18.5',c:1, x:'All of the above confirmed to open from a site device, or able to be produced on request', k:'—'}
+ ]}
+];
+
+let STATE = { entries: {} };
+let ME = '';
+let FILTER = 'all';
+let OPEN = new Set();
+let busy = false;
+
+const $ = s => document.querySelector(s);
+const el = (t, c) => { const e = document.createElement(t); if (c) e.className = c; return e; };
+
+function toast(msg, err){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast up' + (err ? ' err' : '');
+  clearTimeout(t._x);
+  t._x = setTimeout(() => { t.className = 'toast' + (err ? ' err' : ''); }, 2600);
+}
+
+function statusOf(ref){
+  const log = STATE.entries[ref];
+  if (!log || !log.length) return 'open';
+  const withStatus = log.filter(e => e.status);
+  if (!withStatus.length) return 'open';
+  return withStatus[withStatus.length - 1].status;
+}
+function logOf(ref){
+  return (STATE.entries[ref] || []).slice().sort((a,b) => a.ts.localeCompare(b.ts));
+}
+
+const ALL = DATA.flatMap(s => s.items.map(i => ({...i, sec:s.n})));
+
+async function load(){
+  try {
+    const r = await fetch(API_URL);
+    if (r.ok) {
+      const val = await r.json();
+      if (val && val.entries) STATE = val;
+    }
+  } catch(e) {}
+  if (!STATE.entries) STATE.entries = {};
+}
+
+async function pushEntry(ref, entry){
+  let latest = { entries:{} };
+  try {
+    const r = await fetch(API_URL);
+    if (r.ok) latest = await r.json();
+  } catch(e) {}
+  if (!latest.entries) latest.entries = {};
+
+  const seen = new Set((latest.entries[ref] || []).map(e => e.id));
+  const mine = (STATE.entries[ref] || []).filter(e => !seen.has(e.id));
+  latest.entries[ref] = [...(latest.entries[ref] || []), ...mine, entry];
+  latest.updated = new Date().toISOString();
+
+  await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(latest),
+    headers: { 'Content-Type': 'application/json' }
+  });
+  STATE = latest;
+}
+
+async function refresh(silent){
+  try {
+    const r = await fetch(API_URL);
+    if (r.ok) {
+      const next = await r.json();
+      if (JSON.stringify(next) !== JSON.stringify(STATE)) {
+        STATE = next;
+        if (!STATE.entries) STATE.entries = {};
+        render();
+        if (!silent) toast('Updated from the team');
+      }
+    }
+  } catch(e) {}
+  markSynced();
+}
+
+function markSynced(){
+  const s = $('#sync');
+  s.textContent = 'Synced ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  s.classList.remove('on');
+}
+
+function loadName(){
+  ME = localStorage.getItem(NAMEKEY) || '';
+  $('#who').value = ME;
+  updateNameNote();
+}
+function saveName(v){
+  ME = v.trim();
+  updateNameNote();
+  localStorage.setItem(NAMEKEY, ME);
+  render();
+}
+function updateNameNote(){
+  $('#whoNote').textContent = ME
+    ? 'Everyone sharing this link sees the same entries.'
+    : 'Put your name in before you can add an entry.';
+}
+
+function countdown(){
+  const ms = AUDIT - new Date();
+  const n = $('#cdN'), l = $('#cdL');
+  if (ms <= 0){ n.textContent = 'NOW'; l.textContent = 'audit day'; return; }
+  const h = Math.floor(ms / 36e5);
+  if (h >= 48){ n.textContent = Math.floor(h/24); l.textContent = 'days to audit'; }
+  else { n.textContent = h; l.textContent = 'hours to audit'; }
+}
+
+function stats(){
+  let closed = 0, hold = 0, crit = 0;
+  ALL.forEach(i => {
+    const s = statusOf(i.r);
+    if (s === 'closed') closed++;
+    if (s === 'hold') hold++;
+    if (i.c && s !== 'closed') crit++;
+  });
+  $('#sTotal').textContent = ALL.length;
+  $('#sClosed').textContent = closed;
+  $('#sHold').textContent = hold;
+  $('#sCrit').textContent = crit;
+  $('#sBar').style.width = Math.round(closed / ALL.length * 100) + '%';
+}
+
+function render(){
+  stats();
+  const list = $('#list');
+  list.innerHTML = '';
+
+  DATA.forEach(sec => {
+    const visible = sec.items.filter(i => {
+      const s = statusOf(i.r);
+      if (FILTER === 'all') return true;
+      if (FILTER === 'crit') return !!i.c;
+      return s === FILTER;
+    });
+    if (!visible.length) return;
+
+    const openCrit = sec.items.filter(i => i.c && statusOf(i.r) !== 'closed').length;
+    const done = sec.items.filter(i => statusOf(i.r) === 'closed').length;
+
+    const blk = el('section', 'blk');
+    blk.dataset.open = OPEN.has(sec.n) ? 'true' : 'false';
+
+    const h = el('button', 'blk-h');
+    h.setAttribute('aria-expanded', OPEN.has(sec.n));
+    h.innerHTML = `<span class="caret">▾</span>
+      <span class="blk-n">${sec.n}</span>
+      <span class="blk-t">${sec.t}</span>
+      <span class="blk-c">${done}/${sec.items.length} closed${openCrit ? ` · <b>${openCrit} critical open</b>` : ''}</span>`;
+    h.onclick = () => { OPEN.has(sec.n) ? OPEN.delete(sec.n) : OPEN.add(sec.n); render(); };
+    blk.appendChild(h);
+
+    const body = el('div', 'blk-body');
+    if (sec.note){ const n = el('div','note'); n.textContent = sec.note; body.appendChild(n); }
+    visible.forEach(i => body.appendChild(itemRow(i)));
+    blk.appendChild(body);
+    list.appendChild(blk);
+  });
+
+  if (!list.children.length){
+    const e = el('section','blk');
+    e.innerHTML = '<div style="padding:28px;text-align:center;color:var(--ink-3)">Nothing matches that filter.</div>';
+    list.appendChild(e);
+  }
+}
+
+const LABEL = { open:'Not started', progress:'In progress', hold:'On hold', closed:'Closed' };
+
+function itemRow(i){
+  const s = statusOf(i.r);
+  const log = logOf(i.r);
+  const isOpen = OPEN.has('i' + i.r);
+
+  const row = el('div', 'item');
+  row.dataset.s = s;
+  row.dataset.crit = i.c ? '1' : '0';
+  row.dataset.open = isOpen ? '1' : '0';
+  row.appendChild(el('div', 'tape'));
+
+  const inner = el('div', 'item-in');
+
+  const top = el('div', 'item-top');
+  top.innerHTML = `<span class="ref">${i.r}</span>
+    <span class="txt">${i.c ? '<span class="flag">MUST</span>' : ''}${esc(i.x)}
+      <span class="clause">${esc(i.k)}${log.length ? ` &nbsp;·&nbsp; ${log.length} ${log.length===1?'entry':'entries'}` : ''}</span>
+    </span>
+    <span class="pill">${LABEL[s]}</span>`;
+  top.onclick = () => {
+    const k = 'i' + i.r;
+    OPEN.has(k) ? OPEN.delete(k) : OPEN.add(k);
+    render();
+  };
+  inner.appendChild(top);
+
+  const d = el('div', 'detail');
+
+  if (log.length){
+    const ul = el('ul', 'log');
+    log.forEach(e => {
+      const li = el('li', e.status ? 's-' + e.status : '');
+      const when = new Date(e.ts).toLocaleString([], {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+      
+      let evidenceMarkup = '';
+      if (e.evidenceLink) {
+        evidenceMarkup = `<div class="evidence-tag">📄 Evidence Link: <a href="${esc(e.evidenceLink)}" target="_blank">${esc(e.evidenceLink)}</a></div>`;
+      }
+      
+      li.innerHTML = `<div class="meta"><b>${esc(e.who)}</b> · ${when}${e.status ? ' · → ' + LABEL[e.status] : ''}</div>
+                      <div class="body">${esc(e.text)}</div>${evidenceMarkup}`;
+      ul.appendChild(li);
+    });
+    d.appendChild(ul);
+  } else {
+    const p = el('div','empty');
+    p.textContent = 'No entries yet. Write what you did or what is happening, then set the status.';
+    d.appendChild(p);
+  }
+
+  const ta = el('textarea');
+  ta.placeholder = s === 'closed'
+    ? 'Add a further note, or reopen with a reason…'
+    : 'What was done, or what is happening?';
+  d.appendChild(ta);
+
+  const elink = el('input', 'evidence-input');
+  elink.placeholder = 'Paste shared drive link or server file path to validation evidence here (Optional)...';
+  d.appendChild(elink);
+
+  const acts = el('div', 'acts');
+
+  const bProg  = mkBtn('prog',  'In progress', 'progress');
+  const bHold  = mkBtn('hold',  'On hold',     'hold');
+  const bClose = mkBtn('close', 'Close out',   'closed');
+  const bNote  = mkBtn('',      'Add note',    null);
+
+  function mkBtn(cls, label, status){
+    const b = el('button', 'btn ' + cls);
+    b.textContent = label;
+    b.onclick = async () => {
+      const text = ta.value.trim();
+      const evidenceLink = elink.value.trim();
+      if (!ME){ toast('Put your name in the bar at the top first', true); $('#who').focus(); return; }
+      if (text.length < 4){
+        toast(status === 'closed' ? 'Type what was actioned or validated before closing' : 'Write a line saying what is happening', true);
+        ta.focus();
+        return;
+      }
+      if (busy) return;
+      busy = true;
+      acts.querySelectorAll('button').forEach(x => x.disabled = true);
+      $('#sync').textContent = 'Saving…';
+      $('#sync').classList.add('on');
+      try {
+        await pushEntry(i.r, {
+          id: Math.random().toString(36).slice(2) + Date.now().toString(36),
+          who: ME,
+          ts: new Date().toISOString(),
+          text,
+          status,
+          evidenceLink: evidenceLink || null
+        });
+        OPEN.add('i' + i.r);
+        toast(status ? `${i.r} → ${LABEL[status]}` : `Note added to ${i.r}`);
+        await refresh(true);
+      } catch(err){
+        toast('Could not save. Check your connection and try again.', true);
+      }
+      busy = false;
+    };
+    return b;
+  }
+
+  if (s === 'closed'){
+    const reopen = el('button', 'btn reopen');
+    reopen.textContent = 'Reopen';
+    reopen.onclick = bProg.onclick;
+    acts.appendChild(bNote);
+    acts.appendChild(reopen);
+    const h = el('div','hint');
+    h.textContent = 'Closed. Reopening needs a reason, same as closing did.';
+    acts.appendChild(h);
+  } else {
+    acts.appendChild(bProg);
+    acts.appendChild(bHold);
+    acts.appendChild(bClose);
+    acts.appendChild(bNote);
+    const h = el('div','hint block');
+    h.textContent = 'Nothing closes without a written note. Whatever you type here is the record we rely on Thursday.';
+    acts.appendChild(h);
+  }
+
+  d.appendChild(acts);
+  inner.appendChild(d);
+  row.appendChild(inner);
+  return row;
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+$('#filters').addEventListener('click', e => {
+  const b = e.target.closest('.chip[data-f]');
+  if (!b) return;
+  FILTER = b.dataset.f;
+  document.querySelectorAll('.chip[data-f]').forEach(c => c.setAttribute('aria-pressed', c === b));
+  render();
+});
+$('#expandAll').onclick = () => { DATA.forEach(s => OPEN.add(s.n)); render(); };
+$('#collapseAll').onclick = () => { OPEN.clear(); render(); };
+$('#printReportButton').onclick = () => { window.print(); };
+
+let nameT;
+$('#who').addEventListener('input', e => {
+  clearTimeout(nameT);
+  nameT = setTimeout(() => saveName(e.target.value), 400);
+});
+
+(async function init(){
+  countdown();
+  setInterval(countdown, 60000);
+  loadName();
+  await load();
+  OPEN.add('1'); OPEN.add('2');
+  render();
+  markSynced();
+  setInterval(() => refresh(true), 10000);
+  window.addEventListener('focus', () => refresh(true));
+})();
+</script>
+</body>
+</html>
