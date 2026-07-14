@@ -52,7 +52,130 @@
   .sync.on{color:var(--tape-yellow)}
   .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);margin:20px 0;border:1px solid var(--rule);box-shadow:var(--shadow)}
   .stat{background:var(--surface);padding:14px 16px}
-  .stat .k">Items</div><div class="v" id="sTotal">0</div></div>
+  .stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+  .stat .v{font-family:var(--cond);font-size:32px;font-weight:700;line-height:1.1;margin-top:2px}
+  .stat.blocking .v{color:var(--dawsons)}
+  .bar{height:6px;background:var(--rule);margin-top:8px;overflow:hidden;border-radius:2px}
+  .bar span{display:block;height:100%;background:var(--tape-blue);transition:width .4s ease}
+  .filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
+  .chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--surface);border:1px solid var(--rule);color:var(--ink-2);padding:7px 11px;border-radius:2px;cursor:pointer}
+  .chip:hover{border-color:var(--ink-3)}
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip.crit[aria-pressed="true"]{background:var(--dawsons);border-color:var(--dawsons)}
+  .filters .spacer{flex:1}
+  section.blk{background:var(--surface);border:1px solid var(--rule);margin-bottom:12px;box-shadow:var(--shadow)}
+  .blk-h{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:13px 16px;cursor:pointer;font:inherit}
+  .blk-h:hover{background:#F6F8F9}
+  .blk-n{font-family:var(--mono);font-size:11px;color:var(--ink-3);min-width:22px}
+  .blk-t{font-family:var(--cond);font-weight:600;font-size:17px;letter-spacing:.01em;flex:1}
+  .blk-c{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+  .blk-c b{color:var(--dawsons)}
+  .caret{color:var(--ink-3);transition:transform .18s ease;font-size:12px}
+  .blk[data-open="false"] .caret{transform:rotate(-90deg)}
+  .blk[data-open="false"] .blk-body{display:none}
+  .note{background:#FFF8E3;border-left:3px solid var(--tape-yellow);padding:10px 14px;font-size:13px;color:#4A3D14}
+  .item{display:flex;border-top:1px solid var(--rule)}
+  .item:first-child{border-top:0}
+  .tape{width:6px;flex:none;background:var(--tape-none)}
+  .item[data-s="progress"] .tape{background:var(--tape-yellow)}
+  .item[data-s="hold"]     .tape{background:var(--tape-pink)}
+  .item[data-s="closed"]   .tape{background:var(--tape-blue)}
+  .item-in{flex:1;min-width:0;padding:12px 14px}
+  .item-top{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
+  .ref{font-family:var(--mono);font-size:12px;color:var(--ink-3);min-width:38px;padding-top:1px}
+  .txt{flex:1;min-width:0;font-size:14px}
+  .item[data-crit="1"] .txt{font-weight:600}
+  .flag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;background:var(--dawsons);color:#fff;padding:1px 5px;border-radius:2px;margin-right:6px;vertical-align:1px}
+  .clause{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:4px}
+  .pill{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:2px;white-space:nowrap;flex:none;background:#EDF0F2;color:var(--ink-2);border:1px solid var(--rule)}
+  .item[data-s="progress"] .pill{background:#FFF4D6;color:#7A5B00;border-color:#F0D998}
+  .item[data-s="hold"]     .pill{background:#FDE7EE;color:#96153F;border-color:#F4C0D2}
+  .item[data-s="closed"]   .pill{background:#E1EEF9;color:#155189;border-color:#B9D6EE}
+  .detail{display:none;padding:12px 0 4px 50px}
+  .item[data-open="1"] .detail{display:block}
+  .log{list-style:none;margin-bottom:10px}
+  .log li{border-left:2px solid var(--rule);padding:6px 0 6px 12px;margin-bottom:6px}
+  .log li.s-progress{border-color:var(--tape-yellow)}
+  .log li.s-hold{border-color:var(--tape-pink)}
+  .log li.s-closed{border-color:var(--tape-blue)}
+  .log .meta{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-bottom:2px}
+  .log .meta b{color:var(--ink-2)}
+  .log .body{font-size:13.5px;white-space:pre-wrap}
+  .evidence-tag{margin-top:4px;font-size:12px;font-family:var(--mono);background:#E1EEF9;display:inline-block;padding:2px 6px;border-radius:3px;color:#155189}
+  .evidence-tag a{color:#155189;font-weight:600;text-decoration:underline}
+  .empty{font-size:13px;color:var(--ink-3);font-style:italic;margin-bottom:10px}
+  textarea{font:inherit;font-size:14px;width:100%;min-height:64px;resize:vertical;border:1px solid var(--rule);border-radius:2px;padding:9px 11px;background:#FBFCFC}
+  textarea:focus{outline:2px solid var(--tape-blue);outline-offset:-1px;background:#fff}
+  .evidence-input{margin-top:8px;font-size:13px;width:100%;padding:6px 10px;border:1px solid var(--rule);border-radius:2px;background:#FBFCFC}
+  .acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+  .btn{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);padding:8px 12px;border-radius:2px;cursor:pointer}
+  .btn:hover:not(:disabled){border-color:var(--ink-3);color:var(--ink)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.prog[aria-disabled="false"]:hover{background:#FFF4D6;border-color:var(--tape-yellow)}
+  .btn.hold:hover:not(:disabled){background:#FDE7EE;border-color:var(--tape-pink)}
+  .btn.close{background:var(--tape-blue);border-color:var(--tape-blue);color:#fff}
+  .btn.close:hover:not(:disabled){background:#155189}
+  .btn.print{background:var(--dawsons);border-color:var(--dawsons);color:#fff}
+  .btn.print:hover{background:#801020;border-color:#801020}
+  .btn.reopen{margin-left:auto}
+  .hint{font-size:12px;color:var(--ink-3);flex-basis:100%}
+  .hint.block{color:var(--dawsons);font-weight:500}
+  footer{padding:24px 0;font-size:12px;color:var(--ink-3);text-align:center;line-height:1.7}
+  footer b{color:var(--ink-2)}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,90px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:3px;font-family:var(--mono);font-size:12px;letter-spacing:.05em;box-shadow:0 6px 24px rgba(0,0,0,.25);transition:transform .25s ease;z-index:50}
+  .toast.up{transform:translate(-50%,0)}
+  .toast.err{background:var(--dawsons)}
+  @media (max-width:760px){
+    .dash{grid-template-columns:1fr 1fr}
+    h1{font-size:23px}
+    .countdown{text-align:left}
+    .detail{padding-left:0}
+    .item-top{flex-wrap:wrap}
+  }
+  @media print {
+    body { background: #fff; color: #000; padding-bottom: 0; }
+    .mast, .idbar, .filters, textarea, .evidence-input, .acts, .toast, footer, .caret { display: none !important; }
+    .wrap { max-width: 100%; width: 100%; padding: 0; }
+    .dash { background: #fff; border: 2px solid #000; box-shadow: none; margin-top: 0; }
+    .stat { background: #fff; border: 1px solid #ddd; }
+    .stat.blocking .v { color: #000 !important; }
+    .bar { display: none; }
+    section.blk { page-break-inside: avoid; border: 2px solid #333; margin-bottom: 20px; }
+    .blk-body { display: block !important; }
+    .detail { display: block !important; padding-left: 20px; }
+    .item { page-break-inside: avoid; border-top: 1px solid #999; }
+    .tape { border-right: 4px solid #333; }
+  }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap mast-in">
+    <div>
+      <div class="eyebrow">Steel Compliance Australia &nbsp;·&nbsp; Auditor: Ankur</div>
+      <h1>AS 5131 Site Audit — Sun Metals</h1>
+      <div class="sub">Live close-out tracker. Copy and paste network file paths or shared drive links as verification evidence. Use the Filter options below to filter specific views, then hit "Print Report".</div>
+    </div>
+    <div class="countdown">
+      <span class="n" id="cdN">—</span>
+      <span class="l" id="cdL">to audit</span>
+    </div>
+  </div>
+</header>
+
+<div class="idbar">
+  <div class="wrap idbar-in">
+    <label for="who" class="who">Your name</label>
+    <input id="who" placeholder="e.g. Brad W" autocomplete="off">
+    <span class="who" id="whoNote">Everyone sharing this link sees the same entries.</span>
+    <span class="sync" id="sync">Loading…</span>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="dash">
+    <div class="stat"><div class="k">Items</div><div class="v" id="sTotal">0</div></div>
     <div class="stat blocking"><div class="k">Critical still open</div><div class="v" id="sCrit">0</div></div>
     <div class="stat"><div class="k">On hold</div><div class="v" id="sHold">0</div></div>
     <div class="stat">
@@ -475,7 +598,6 @@ function createItemRowDOM(i){
   const acts = el('div', 'acts');
   acts.id = `acts-container-${i.r}`;
   
-  // Appends static control set dynamically managed by updateUIIncremental
   d.appendChild(acts);
   inner.appendChild(d);
   row.appendChild(inner);
@@ -499,10 +621,8 @@ function updateUIIncremental(){
       
       row.dataset.s = s;
       
-      // Update badge label text dynamically
       $(`#pill-badge-${i.r}`).textContent = LABEL[s];
       
-      // Update history notes array log trail safely without replacing input elements
       const logs = logOf(i.r);
       const logContainer = $(`#log-container-${i.r}`);
       $(`#clause-text-${i.r}`).innerHTML = `${esc(i.k)}${logs.length ? ` &nbsp;·&nbsp; ${logs.length} ${logs.length===1?'entry':'entries'}` : ''}`;
@@ -525,7 +645,6 @@ function updateUIIncremental(){
         }
       }
 
-      // Update button layout configurations without replacing parent elements
       const acts = $(`#acts-container-${i.r}`);
       const ta = $(`#textarea-${i.r}`);
       if (acts && ta) {
@@ -547,20 +666,17 @@ function updateUIIncremental(){
         }
       }
 
-      // Filter processing rule visibility execution
       let visibleByFilter = true;
       if (FILTER === 'crit' && !i.c) visibleByFilter = false;
       if (FILTER !== 'all' && FILTER !== 'crit' && s !== FILTER) visibleByFilter = false;
       row.style.display = visibleByFilter ? 'flex' : 'none';
     });
 
-    // Update Category Section Header Counters layout fields dynamically
     const counterSpan = $(`#sec-counter-${sec.n}`);
     if (counterSpan) {
       counterSpan.innerHTML = `${closedCount}/${sec.items.length} closed${openCritCount ? ` · <b>${openCritCount} critical open</b>` : ''}`;
     }
     
-    // Hide empty block sets matching active filter rules layout constraints
     const blk = $(`#sec-block-${sec.n}`);
     if (blk) {
       const currentVisibleItems = sec.items.filter(i => {
