@@ -453,6 +453,7 @@ async function pushEntry(ref, entry){
 
   await fetch(API_URL, {
     method: 'POST',
+    mode: 'cors',
     body: JSON.stringify(latest),
     headers: { 'Content-Type': 'application/json' }
   });
@@ -656,11 +657,15 @@ function itemRow(i){
         ta.focus();
         return;
       }
-      if (busy) return;
-      busy = true;
+      
+      // Prevent double submissions while processing network request
+      if (b.disabled) return;
+      
       acts.querySelectorAll('button').forEach(x => x.disabled = true);
-      $('#sync').textContent = 'Saving…';
+      const prevSyncText = $('#sync').textContent;
+      $('#sync').textContent = 'Saving to Server…';
       $('#sync').classList.add('on');
+      
       try {
         await pushEntry(i.r, {
           id: Math.random().toString(36).slice(2) + Date.now().toString(36),
@@ -672,11 +677,17 @@ function itemRow(i){
         });
         OPEN.add('i' + i.r);
         toast(status ? `${i.r} → ${LABEL[status]}` : `Note added to ${i.r}`);
+        ta.value = '';
+        elink.value = '';
         await refresh(true);
       } catch(err){
-        toast('Could not save. Check your connection and try again.', true);
+        alert("Network Error: The storage server dropped the request. Re-enabling buttons so your text isn't lost. Try saving again!");
+      } finally {
+        acts.querySelectorAll('button').forEach(x => x.disabled = false);
+        $('#sync').textContent = prevSyncText;
+        $('#sync').classList.remove('on');
+        render();
       }
-      busy = false;
     };
     return b;
   }
