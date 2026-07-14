@@ -359,7 +359,7 @@ const DATA = [
   {r:'16.2',c:1, x:'75 mm wide weld margin left uncoated at site welds and masked', k:'Cl 9.9.9'},
   {r:'16.3',c:0, x:'Traceability back to mill test certificates maintained', k:'Cl 4.7; 6.2'},
   {r:'16.4',c:0, x:'Steel store on dunnage, clear of the ground, protected from coating abrasion', k:'Cl 9.9.19; 11.5.6'},
-  {r:'16.5',c:0, x:'Damage to painted or galvanized surfaces repaired per Cl 9.12', k:'Cl 11.5.6'}
+  {r:'16.5',c:0, x:'Damage to painted or galvanized surfaces repaired per Cl 9.12', k(--cl 11.5.6--'
  ]},
  {n:'17', t:'Safety of the works & PPE', items:[
   {r:'17.1',c:1, x:'Safety glasses on everyone. No exceptions while he is on site.', k:'Cl 4.5.3; WHS'},
@@ -382,7 +382,6 @@ let STATE = { entries: {} };
 let ME = '';
 let FILTER = 'all';
 let OPEN = new Set();
-let busy = false;
 
 const $ = s => document.querySelector(s);
 const el = (t, c) => { const e = document.createElement(t); if (c) e.className = c; return e; };
@@ -440,15 +439,13 @@ async function pushEntry(ref, entry){
     const r = await fetch(API_URL);
     if (r.ok) {
       latest = await r.json();
-    } else if (r.status === 404) {
-      latest = { entries:{} };
     }
   } catch(e) {}
   if (!latest.entries) latest.entries = {};
 
-  const seen = new Set((latest.entries[ref] || []).map(e => e.id));
-  const mine = (STATE.entries[ref] || []).filter(e => !seen.has(e.id));
-  latest.entries[ref] = [...(latest.entries[ref] || []), ...mine, entry];
+  // Preserve all server-side historical logs explicitly 
+  if(!latest.entries[ref]) latest.entries[ref] = [];
+  latest.entries[ref].push(entry);
   latest.updated = new Date().toISOString();
 
   await fetch(API_URL, {
@@ -658,7 +655,6 @@ function itemRow(i){
         return;
       }
       
-      // Prevent double submissions while processing network request
       if (b.disabled) return;
       
       acts.querySelectorAll('button').forEach(x => x.disabled = true);
