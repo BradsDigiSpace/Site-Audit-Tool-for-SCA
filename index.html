@@ -307,7 +307,7 @@ const DATA = [
   {r:'10.1',c:1, x:'Inspection wrench calibrated AT LEAST ONCE PER SHIFT. The calibration value cannot be transferred to another wrench.', k:'App H2'},
   {r:'10.2',c:1, x:'Job inspection torque set from at least three bolts in a bolt-tension calibrating device, tensioned to 1.05 × minimum bolt tension, measuring the torque to turn the nut 5°', k:'App H2'},
   {r:'10.3',c:0, x:'Sample size: 10% of bolts, but not less than two bolts in each connection', k:'App H3'},
-  {r:'10.4',c:1, x:'If any nut turns under the job inspection torque, that torque is applied to ALL bolts in the connection and every one that turns is re-tensioned and re-inspected', k:'App H4'}
+  {r:'10.4',c:1, x:'If any nut turned under the job inspection torque, that torque is applied to ALL bolts in the connection and every one that turns is re-tensioned and re-inspected', k:'App H4'}
  ]},
  {n:'11', t:'Site survey & supports', items:[
   {r:'11.1',c:1, x:'All setting out by competent personnel. All surveys DOCUMENTED AND VERIFIED.', k:'Cl 11.3'},
@@ -359,7 +359,7 @@ const DATA = [
   {r:'16.2',c:1, x:'75 mm wide weld margin left uncoated at site welds and masked', k:'Cl 9.9.9'},
   {r:'16.3',c:0, x:'Traceability back to mill test certificates maintained', k:'Cl 4.7; 6.2'},
   {r:'16.4',c:0, x:'Steel store on dunnage, clear of the ground, protected from coating abrasion', k:'Cl 9.9.19; 11.5.6'},
-  {r:'16.5',c:0, x:'Damage to painted or galvanized surfaces repaired per Cl 9.12', k(--cl 11.5.6--'
+  {r:'16.5',c:0, x:'Damage to painted or galvanized surfaces repaired per Cl 9.12', k:'Cl 11.5.6'}
  ]},
  {n:'17', t:'Safety of the works & PPE', items:[
   {r:'17.1',c:1, x:'Safety glasses on everyone. No exceptions while he is on site.', k:'Cl 4.5.3; WHS'},
@@ -443,7 +443,6 @@ async function pushEntry(ref, entry){
   } catch(e) {}
   if (!latest.entries) latest.entries = {};
 
-  // Preserve all server-side historical logs explicitly 
   if(!latest.entries[ref]) latest.entries[ref] = [];
   latest.entries[ref].push(entry);
   latest.updated = new Date().toISOString();
@@ -655,9 +654,9 @@ function itemRow(i){
         return;
       }
       
-      if (b.disabled) return;
-      
-      acts.querySelectorAll('button').forEach(x => x.disabled = true);
+      // Select all button elements to deactivate them
+      const trackingButtons = acts.querySelectorAll('button');
+      trackingButtons.forEach(x => x.disabled = true);
       const prevSyncText = $('#sync').textContent;
       $('#sync').textContent = 'Saving to Server…';
       $('#sync').classList.add('on');
@@ -679,7 +678,7 @@ function itemRow(i){
       } catch(err){
         alert("Network Error: The storage server dropped the request. Re-enabling buttons so your text isn't lost. Try saving again!");
       } finally {
-        acts.querySelectorAll('button').forEach(x => x.disabled = false);
+        trackingButtons.forEach(x => x.disabled = false);
         $('#sync').textContent = prevSyncText;
         $('#sync').classList.remove('on');
         render();
