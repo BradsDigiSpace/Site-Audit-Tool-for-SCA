@@ -225,19 +225,25 @@
 </main>
 
 <footer class="wrap">
-  <b>DAW-TSV-CHK-001 · Rev 4</b> — clause references verified against AS/NZS 5131:2016. Single-key sync with merge-safe saves.<br>
+  <b>DAW-TSV-CHK-001 · Rev 6</b> — clause references verified against AS/NZS 5131:2016. Google Apps Script storage with server-side locking; entries mirrored to a Google Sheet.<br>
   Entries are shared with everyone who has this link. Don't put anything in here you wouldn't hand to the auditor.
 </footer>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const BUCKET = 'as5131-sunmetals-dawsons-2026';
-const API_URL = `https://kvdb.io/MN94Xg41mX74m8Z5aP5JvC/${BUCKET}`;
-/* Rev 2: all entries live under ONE key instead of 125 — one fetch per refresh.
-   Saves use read-merge-write with verification retries so two people saving
-   at the same moment cannot wipe each other's entries. */
-const KEY_URL = `${API_URL}-all`;
+/* ============================================================
+   ⚠️  ONE THING TO CONFIGURE  ⚠️
+   Paste your Google Apps Script web app URL (ends in /exec)
+   between the quotes below. Setup steps are in the companion
+   file as5131-apps-script-backend.txt.
+   ============================================================ */
+const GAS_URL = 'PASTE-YOUR-APPS-SCRIPT-EXEC-URL-HERE';
+/* Rev 6: storage moved from kvdb.io (whose bucket turned out never to exist —
+   the reason no save ever persisted) to a Google Apps Script owned by Dawsons.
+   The server holds a lock while writing, so simultaneous saves queue up and
+   can never overwrite each other. Every entry is also mirrored to a Google
+   Sheet as a timestamped audit-evidence trail. */
 const NAMEKEY = 'as5131-my-name';
 const AUDIT = new Date('2026-07-16T08:00:00+10:00');
 
@@ -447,42 +453,35 @@ function logOf(ref){
 
 const ALL = DATA.flatMap(s => s.items.map(i => ({...i, sec:s.n})));
 
-/* ---------- Rev 2 storage: one key, merge-safe ---------- */
+/* ---------- Rev 6 storage: Google Apps Script, server-side locking ---------- */
 
 const sleep = ms => new Promise(res => setTimeout(res, ms));
+let LAST_ERR = '';   /* human-readable reason for the most recent storage failure */
+
+function gasConfigured(){
+  return typeof GAS_URL === 'string' && GAS_URL.indexOf('/exec') !== -1 && GAS_URL.indexOf('PASTE') === -1;
+}
 
 /* Fetch the whole shared state in ONE request.
-   cache:'no-store' is CRITICAL — without it the browser can answer these reads
-   from its HTTP cache, so the save-confirmation check sees a stale copy and
-   wrongly reports the save as failed.
-   Returns: entries object, or 'missing' (key not created yet), or null (network error). */
+   Returns: entries object, or null (network error / not configured). */
 async function fetchAll(){
+  if (!gasConfigured()){ LAST_ERR = 'storage URL not configured yet'; return null; }
   try {
-    /* Unique timestamp per read defeats CDN/proxy caches that ignore no-store */
-    const r = await fetch(`${KEY_URL}?_=${Date.now()}`, { cache: 'no-store' });
-    if (r.status === 404) return 'missing';
-    if (!r.ok) return null;
+    /* Unique timestamp per read defeats any cache between us and Google */
+    const r = await fetch(`${GAS_URL}?_=${Date.now()}`, { cache: 'no-store', redirect: 'follow' });
+    if (!r.ok){ LAST_ERR = 'read failed — HTTP ' + r.status; return null; }
     const val = await r.json();
-    return (val && val.logs) ? val.logs : 'missing';
+    if (val && val.ok && val.logs) return val.logs;
+    LAST_ERR = 'read failed — unexpected server reply' + (val && val.error ? ': ' + val.error : '');
+    return null;
   } catch(e){
+    LAST_ERR = 'read failed — network: ' + (e && e.message ? e.message : e);
     return null;
   }
 }
 
-async function postAll(){
-  const r = await fetch(KEY_URL, {
-    method: 'POST',
-    mode: 'cors',
-    cache: 'no-store',
-    body: JSON.stringify({ logs: STATE.entries, savedAt: new Date().toISOString() }),
-    headers: { 'Content-Type': 'application/json' }
-  });
-  if (!r.ok) throw new Error('post-failed');
-}
-
 /* Merge two entry arrays. Every entry has a unique random id, so a simple
-   union-by-id means nobody's entry can ever be lost in a merge — if Brad and
-   Joel both save at once, the merged list contains both entries. */
+   union-by-id means nobody's entry can ever be lost in a merge. */
 function mergeEntries(a, b){
   const map = {};
   [...(a || []), ...(b || [])].forEach(e => { if (e && e.id) map[e.id] = e; });
@@ -497,60 +496,48 @@ function mergeStates(remote){
   return out;
 }
 
-/* One-time migration: pull any entries saved under the old Rev 1 per-item keys
-   so nothing already logged is lost, then fold them into the single key. */
-async function legacyLoad(){
-  const promises = ALL.map(async (item) => {
-    try {
-      const r = await fetch(`${API_URL}-${item.r}`, { cache: 'no-store' });
-      if (r.ok) {
-        const val = await r.json();
-        if (val && val.logs) STATE.entries[item.r] = mergeEntries(STATE.entries[item.r], val.logs);
-      }
-    } catch (e) {}
-  });
-  await Promise.all(promises);
-}
-
 async function load(){
   const remote = await fetchAll();
-  if (remote === null) return;                       // network error — keep what we have
-  if (remote !== 'missing'){ STATE.entries = mergeStates(remote); return; }
-  await legacyLoad();                                // first run on Rev 2: migrate old data
-  if (Object.keys(STATE.entries).length){
-    try { await postAll(); } catch(e) {}
-  }
+  if (remote) STATE.entries = mergeStates(remote);
 }
 
-/* SAFEGUARD: read-merge-write with verification.
-   1. Add the entry locally.
-   2. Read the latest server copy and MERGE it in (so a teammate's save made a
-      moment ago is preserved).
-   3. Write the merged set back.
-   4. Wait a beat, re-read, and CHECK our entry actually landed. If someone
-      else's write overlapped ours and clobbered it, merge and write again —
-      up to 4 attempts with staggered random delays so two colliding browsers
-      stop tripping over each other. */
+/* Save ONE entry. The Apps Script holds a lock while appending, so two people
+   saving at the same instant queue up server-side — no overwrites possible.
+   The server replies with the full updated state, which doubles as the
+   confirmation that the entry landed. Retries cover network hiccups.
+   NOTE: no Content-Type header on purpose — a plain POST is a "simple" CORS
+   request that browsers send without a preflight permission check. */
 async function pushEntry(ref, entry){
   if (!STATE.entries[ref]) STATE.entries[ref] = [];
   STATE.entries[ref] = mergeEntries(STATE.entries[ref], [entry]);
 
-  for (let attempt = 0; attempt < 4; attempt++){
-    if (attempt) await sleep(300 + Math.random() * 600);
+  if (!gasConfigured()){
+    LAST_ERR = 'storage URL not configured — open the HTML file and paste your Apps Script /exec URL into GAS_URL near the top of the script';
+    throw new Error('not-configured');
+  }
 
-    const remote = await fetchAll();
-    if (remote !== null && remote !== 'missing') STATE.entries = mergeStates(remote);
-
-    try { await postAll(); } catch(e){ continue; }
-
-    await sleep(500 + attempt * 400 + Math.random() * 300);
-    const check = await fetchAll();
-    if (check !== null && check !== 'missing'){
-      STATE.entries = mergeStates(check);
-      const landed = (check[ref] || []).some(e => e.id === entry.id);
-      if (landed) return;                            // confirmed on the server
-    } else if (check === null && attempt === 3) {
-      break;                                         // network gone — give up loudly
+  for (let attempt = 0; attempt < 3; attempt++){
+    if (attempt) await sleep(500 + Math.random() * 700);
+    try {
+      const r = await fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',
+        redirect: 'follow',
+        body: JSON.stringify({ ref, entry })
+      });
+      if (!r.ok){ LAST_ERR = 'write failed — HTTP ' + r.status; continue; }
+      const val = await r.json();
+      if (val && val.ok && val.logs){
+        STATE.entries = mergeStates(val.logs);
+        const landed = (val.logs[ref] || []).some(e => e.id === entry.id);
+        if (landed) return;                    // confirmed by the server itself
+        LAST_ERR = 'server accepted the request but the entry is missing from its reply';
+      } else {
+        LAST_ERR = 'write failed — server error' + (val && val.error ? ': ' + val.error : '');
+      }
+    } catch(e){
+      LAST_ERR = 'write failed — network: ' + (e && e.message ? e.message : e);
     }
   }
   throw new Error('save-not-confirmed');
@@ -849,7 +836,7 @@ function createActionBtn(i, cls, label, targetStatus) {
       if (elink) elink.value = '';
       await refresh(true);
     } catch(err){
-      alert("Save could not be confirmed on the server after several attempts. Your entry is still on THIS screen — check your connection and hit the button again.");
+      alert("Save could not be confirmed on the server after several attempts.\n\nReason: " + (LAST_ERR || "server kept returning a copy without this entry") + "\n\nYour entry is still on THIS screen. Tell Claude the reason line above and it can be fixed properly.");
     } finally {
       activeControlSet.forEach(x => x.disabled = false);
       $('#sync').textContent = prevSyncText;
@@ -902,8 +889,12 @@ $('#who').addEventListener('input', e => {
   countdown();
   setInterval(countdown, 60000);
   loadName();
+  if (!gasConfigured()){
+    const s = $('#sync');
+    if (s){ s.textContent = '⚠ storage not configured — see GAS_URL in the code'; s.classList.add('on'); }
+  }
   await load();
-  markSynced();
+  if (gasConfigured()) markSynced();
   OPEN.add('1'); OPEN.add('2'); OPEN.add('3');
   buildInitialUI();
   setInterval(() => refresh(true), 12000);
