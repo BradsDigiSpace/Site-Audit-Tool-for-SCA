@@ -132,8 +132,6 @@
     .detail{padding-left:0}
     .item-top{flex-wrap:wrap}
   }
-
-  /* ---------- Clean Print Layout Rules ---------- */
   @media print {
     body { background: #fff; color: #000; padding-bottom: 0; }
     .mast, .idbar, .filters, textarea, .evidence-input, .acts, .toast, footer, .caret { display: none !important; }
@@ -415,17 +413,39 @@ async function load(){
     const r = await fetch(API_URL);
     if (r.ok) {
       const val = await r.json();
-      if (val && val.entries) STATE = val;
+      if (val && val.entries) {
+        STATE = val;
+      }
+    } else if (r.status === 404) {
+      // Auto-initialize bucket if it doesn't exist yet!
+      await initializeDatabase();
     }
   } catch(e) {}
   if (!STATE.entries) STATE.entries = {};
+}
+
+async function initializeDatabase() {
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ entries: {} }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    console.log("Database initialized successfully.");
+  } catch(e) {
+    console.error("Failed to auto-initialize database.");
+  }
 }
 
 async function pushEntry(ref, entry){
   let latest = { entries:{} };
   try {
     const r = await fetch(API_URL);
-    if (r.ok) latest = await r.json();
+    if (r.ok) {
+      latest = await r.json();
+    } else if (r.status === 404) {
+      latest = { entries:{} };
+    }
   } catch(e) {}
   if (!latest.entries) latest.entries = {};
 
@@ -460,8 +480,10 @@ async function refresh(silent){
 
 function markSynced(){
   const s = $('#sync');
-  s.textContent = 'Synced ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  s.classList.remove('on');
+  if (s) {
+    s.textContent = 'Synced ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    s.classList.remove('on');
+  }
 }
 
 function loadName(){
@@ -474,6 +496,8 @@ function saveName(v){
   updateNameNote();
   localStorage.setItem(NAMEKEY, ME);
   render();
+  // Ensure database wakes up when name is typed
+  load();
 }
 function updateNameNote(){
   $('#whoNote').textContent = ME
@@ -484,6 +508,7 @@ function updateNameNote(){
 function countdown(){
   const ms = AUDIT - new Date();
   const n = $('#cdN'), l = $('#cdL');
+  if (!n || !l) return;
   if (ms <= 0){ n.textContent = 'NOW'; l.textContent = 'audit day'; return; }
   const h = Math.floor(ms / 36e5);
   if (h >= 48){ n.textContent = Math.floor(h/24); l.textContent = 'days to audit'; }
