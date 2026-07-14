@@ -35,6 +35,8 @@
     padding-bottom:80px;
   }
   .wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+  /* ---------- Masthead ---------- */
   header.mast{background:var(--ink);color:#fff;border-bottom:4px solid var(--dawsons)}
   .mast-in{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;padding:20px 0 18px}
   .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8FA0AC;margin-bottom:6px}
@@ -43,108 +45,132 @@
   .countdown{font-family:var(--cond);text-align:right;line-height:1}
   .countdown .n{font-size:44px;font-weight:700;display:block}
   .countdown .l{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8FA0AC}
+
+  /* ---------- Identity bar ---------- */
   .idbar{background:#232A2F;color:#CBD5DB;border-bottom:1px solid #323C43}
   .idbar-in{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:10px 0;font-size:13px}
+  .idbar label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#8FA0AC}
   .idbar input{font:inherit;background:#151A1E;border:1px solid #3C464D;color:#fff;padding:6px 10px;border-radius:3px;width:190px}
   .idbar input:focus{outline:2px solid var(--tape-yellow);outline-offset:1px}
   .who{font-family:var(--mono);font-size:12px;color:#8FA0AC}
   .sync{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#7E8B94}
   .sync.on{color:var(--tape-yellow)}
+
+  /* ---------- Stats ---------- */
   .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);margin:20px 0;border:1px solid var(--rule);box-shadow:var(--shadow)}
   .stat{background:var(--surface);padding:14px 16px}
   .stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
-  .stat .v{font-family:var(--cond);font-size:32px;font-weight:700;line-height:1.1;margin-top:2px}
+  .stat .v{font-family:var(--cond);font-weight:700;font-size:34px;line-height:1.15}
   .stat.blocking .v{color:var(--dawsons)}
-  .bar{height:6px;background:var(--rule);margin-top:8px;overflow:hidden;border-radius:2px}
-  .bar span{display:block;height:100%;background:var(--tape-blue);transition:width .4s ease}
-  .filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
-  .chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--surface);border:1px solid var(--rule);color:var(--ink-2);padding:7px 11px;border-radius:2px;cursor:pointer}
-  .chip:hover{border-color:var(--ink-3)}
-  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
-  .chip.crit[aria-pressed="true"]{background:var(--dawsons);border-color:var(--dawsons)}
+  .stat .bar{height:6px;background:var(--zinc);border-radius:3px;margin-top:8px;overflow:hidden}
+  .stat .bar span{display:block;height:100%;background:var(--tape-blue);transition:width .4s ease}
+  @media (max-width:720px){.dash{grid-template-columns:repeat(2,1fr)}}
+
+  /* ---------- Filters ---------- */
+  .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 18px}
   .filters .spacer{flex:1}
-  section.blk{background:var(--surface);border:1px solid var(--rule);margin-bottom:12px;box-shadow:var(--shadow)}
-  .blk-h{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--rule);padding:13px 16px;cursor:pointer;font:inherit}
-  .blk-h:hover{background:#F6F8F9}
-  .blk-n{font-family:var(--mono);font-size:11px;color:var(--ink-3);min-width:22px}
-  .blk-t{font-family:var(--cond);font-weight:600;font-size:17px;letter-spacing:.01em;flex:1}
-  .blk-c{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
-  .blk-c b{color:var(--dawsons)}
-  .caret{color:var(--ink-3);transition:transform .18s ease;font-size:12px}
+  .chip{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--surface);color:var(--ink-2);border:1px solid var(--rule);
+    padding:7px 12px;border-radius:3px;cursor:pointer}
+  .chip:hover{border-color:var(--ink-3)}
+  .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip.crit[aria-pressed="true"]{background:var(--dawsons);border-color:var(--dawsons)}
+
+  /* ---------- Section blocks ---------- */
+  .blk{background:var(--surface);border:1px solid var(--rule);box-shadow:var(--shadow);margin-bottom:14px}
+  .blk-h{display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;
+    background:none;border:0;padding:14px 16px;cursor:pointer;font-family:var(--cond)}
+  .blk-h:hover{background:#F5F7F8}
+  .caret{color:var(--ink-3);font-size:13px;transition:transform .15s ease}
   .blk[data-open="false"] .caret{transform:rotate(-90deg)}
+  .blk-n{font-family:var(--mono);font-size:12px;color:var(--ink-3);min-width:22px}
+  .blk-t{font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.01em;flex:1}
+  .blk-c{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+  .blk-c b{color:var(--dawsons);font-weight:600}
+  .blk-body{border-top:1px solid var(--rule)}
   .blk[data-open="false"] .blk-body{display:none}
-  .note{background:#FFF8E3;border-left:3px solid var(--tape-yellow);padding:10px 14px;font-size:13px;color:#4A3D14}
-  .item{display:flex;border-top:1px solid var(--rule)}
-  .item:first-child{border-top:0}
-  .tape{width:6px;flex:none;background:var(--tape-none)}
+  .note{font-size:13px;color:var(--ink-2);background:#FBF6E9;border-bottom:1px solid #EFE3BE;padding:10px 16px}
+
+  /* ---------- Items ---------- */
+  .item{display:flex;border-bottom:1px solid var(--rule)}
+  .item:last-child{border-bottom:0}
+  .tape{width:5px;flex:none;background:var(--tape-none)}
   .item[data-s="progress"] .tape{background:var(--tape-yellow)}
-  .item[data-s="hold"]     .tape{background:var(--tape-pink)}
-  .item[data-s="closed"]   .tape{background:var(--tape-blue)}
-  .item-in{flex:1;min-width:0;padding:12px 14px}
-  .item-top{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
-  .ref{font-family:var(--mono);font-size:12px;color:var(--ink-3);min-width:38px;padding-top:1px}
+  .item[data-s="hold"] .tape{background:var(--tape-pink)}
+  .item[data-s="closed"] .tape{background:var(--tape-blue)}
+  .item-in{flex:1;min-width:0}
+  .item-top{display:flex;gap:12px;align-items:flex-start;padding:11px 16px;cursor:pointer}
+  .item-top:hover{background:#F5F7F8}
+  .ref{font-family:var(--mono);font-size:12px;color:var(--ink-3);min-width:36px;padding-top:2px}
   .txt{flex:1;min-width:0;font-size:14px}
-  .item[data-crit="1"] .txt{font-weight:600}
-  .flag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;background:var(--dawsons);color:#fff;padding:1px 5px;border-radius:2px;margin-right:6px;vertical-align:1px}
-  .clause{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:4px}
-  .pill{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:2px;white-space:nowrap;flex:none;background:#EDF0F2;color:var(--ink-2);border:1px solid var(--rule)}
-  .item[data-s="progress"] .pill{background:#FFF4D6;color:#7A5B00;border-color:#F0D998}
-  .item[data-s="hold"]     .pill{background:#FDE7EE;color:#96153F;border-color:#F4C0D2}
-  .item[data-s="closed"]   .pill{background:#E1EEF9;color:#155189;border-color:#B9D6EE}
-  .detail{display:none;padding:12px 0 4px 50px}
+  .flag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+    background:var(--dawsons);color:#fff;padding:1px 6px;border-radius:2px;margin-right:8px;vertical-align:2px}
+  .clause{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:3px}
+  .pill{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+    border:1px solid var(--rule);color:var(--ink-2);padding:3px 9px;border-radius:99px;margin-top:2px}
+  .item[data-s="progress"] .pill{border-color:var(--tape-yellow);color:#8A6600;background:#FCF4DC}
+  .item[data-s="hold"] .pill{border-color:var(--tape-pink);color:#A52250;background:#FBE9F0}
+  .item[data-s="closed"] .pill{border-color:var(--tape-blue);color:#155380;background:#E7F1F9}
+
+  .detail{display:none;padding:0 16px 16px 64px}
   .item[data-open="1"] .detail{display:block}
-  .log{list-style:none;margin-bottom:10px}
-  .log li{border-left:2px solid var(--rule);padding:6px 0 6px 12px;margin-bottom:6px}
-  .log li.s-progress{border-color:var(--tape-yellow)}
-  .log li.s-hold{border-color:var(--tape-pink)}
-  .log li.s-closed{border-color:var(--tape-blue)}
-  .log .meta{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-bottom:2px}
-  .log .meta b{color:var(--ink-2)}
-  .log .body{font-size:13.5px;white-space:pre-wrap}
-  .evidence-tag{margin-top:4px;font-size:12px;font-family:var(--mono);background:#E1EEF9;display:inline-block;padding:2px 6px;border-radius:3px;color:#155189}
-  .evidence-tag a{color:#155189;font-weight:600;text-decoration:underline}
-  .empty{font-size:13px;color:var(--ink-3);font-style:italic;margin-bottom:10px}
-  textarea{font:inherit;font-size:14px;width:100%;min-height:64px;resize:vertical;border:1px solid var(--rule);border-radius:2px;padding:9px 11px;background:#FBFCFC}
-  textarea:focus{outline:2px solid var(--tape-blue);outline-offset:-1px;background:#fff}
-  .evidence-input{margin-top:8px;font-size:13px;width:100%;padding:6px 10px;border:1px solid var(--rule);border-radius:2px;background:#FBFCFC}
-  .acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
-  .btn{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);padding:8px 12px;border-radius:2px;cursor:pointer}
-  .btn:hover:not(:disabled){border-color:var(--ink-3);color:var(--ink)}
-  .btn:disabled{opacity:.4;cursor:not-allowed}
-  .btn.prog[aria-disabled="false"]:hover{background:#FFF4D6;border-color:var(--tape-yellow)}
-  .btn.hold:hover:not(:disabled){background:#FDE7EE;border-color:var(--tape-pink)}
-  .btn.close{background:var(--tape-blue);border-color:var(--tape-blue);color:#fff}
-  .btn.close:hover:not(:disabled){background:#155189}
-  .btn.print{background:var(--dawsons);border-color:var(--dawsons);color:#fff}
-  .btn.print:hover{background:#801020;border-color:#801020}
-  .btn.reopen{margin-left:auto}
-  .hint{font-size:12px;color:var(--ink-3);flex-basis:100%}
-  .hint.block{color:var(--dawsons);font-weight:500}
-  footer{padding:24px 0;font-size:12px;color:var(--ink-3);text-align:center;line-height:1.7}
+
+  /* ---------- Log ---------- */
+  .log{list-style:none;margin:0 0 12px;border-left:2px solid var(--rule)}
+  .log li{padding:8px 0 8px 14px}
+  .log li + li{border-top:1px dashed var(--rule)}
+  .log .meta{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .log .meta b{color:var(--ink-2);font-weight:600}
+  .log .body{font-size:13.5px;margin-top:2px;white-space:pre-wrap}
+  .log li.s-closed .meta{color:#155380}
+  .log li.s-hold .meta{color:#A52250}
+  .log li.s-progress .meta{color:#8A6600}
+  .evidence-tag{font-family:var(--mono);font-size:11.5px;margin-top:4px;color:var(--ink-2);word-break:break-all}
+  .evidence-tag a{color:var(--tape-blue)}
+  .empty{font-size:13px;color:var(--ink-3);font-style:italic;margin-bottom:12px}
+
+  /* ---------- Entry controls ---------- */
+  .detail textarea{width:100%;min-height:64px;resize:vertical;font:inherit;font-size:13.5px;
+    border:1px solid var(--rule);border-radius:3px;padding:9px 11px;margin-bottom:8px;background:#FDFDFE}
+  .detail textarea:focus,.evidence-input:focus{outline:2px solid var(--tape-blue);outline-offset:1px}
+  .evidence-input{width:100%;font-family:var(--mono);font-size:12px;border:1px solid var(--rule);
+    border-radius:3px;padding:8px 11px;margin-bottom:10px;background:#FDFDFE;color:var(--ink-2)}
+  .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .btn{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    background:var(--surface);border:1px solid var(--rule);color:var(--ink-2);
+    padding:8px 13px;border-radius:3px;cursor:pointer}
+  .btn:hover{border-color:var(--ink-3)}
+  .btn:disabled{opacity:.45;cursor:wait}
+  .btn.prog{border-color:var(--tape-yellow);color:#8A6600}
+  .btn.hold{border-color:var(--tape-pink);color:#A52250}
+  .btn.close{background:var(--ink);border-color:var(--ink);color:#fff}
+  .btn.close:hover{background:#000}
+  .btn.reopen{border-color:var(--tape-yellow);color:#8A6600}
+  .hint{font-size:12px;color:var(--ink-3)}
+  .hint.block{flex-basis:100%}
+
+  /* ---------- Footer / toast ---------- */
+  footer.wrap{font-size:12px;color:var(--ink-3);margin-top:26px;line-height:1.7}
   footer b{color:var(--ink-2)}
-  .toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,90px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:3px;font-family:var(--mono);font-size:12px;letter-spacing:.05em;box-shadow:0 6px 24px rgba(0,0,0,.25);transition:transform .25s ease;z-index:50}
-  .toast.up{transform:translate(-50%,0)}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,80px);
+    background:var(--ink);color:#fff;font-family:var(--mono);font-size:12px;
+    padding:10px 18px;border-radius:4px;box-shadow:var(--shadow);
+    opacity:0;transition:transform .25s ease,opacity .25s ease;pointer-events:none;max-width:90vw}
+  .toast.up{transform:translate(-50%,0);opacity:1}
   .toast.err{background:var(--dawsons)}
-  @media (max-width:760px){
-    .dash{grid-template-columns:1fr 1fr}
-    h1{font-size:23px}
-    .countdown{text-align:left}
-    .detail{padding-left:0}
-    .item-top{flex-wrap:wrap}
-  }
-  @media print {
-    body { background: #fff; color: #000; padding-bottom: 0; }
-    .mast, .idbar, .filters, textarea, .evidence-input, .acts, .toast, footer, .caret { display: none !important; }
-    .wrap { max-width: 100%; width: 100%; padding: 0; }
-    .dash { background: #fff; border: 2px solid #000; box-shadow: none; margin-top: 0; }
-    .stat { background: #fff; border: 1px solid #ddd; }
-    .stat.blocking .v { color: #000 !important; }
-    .bar { display: none; }
-    section.blk { page-break-inside: avoid; border: 2px solid #333; margin-bottom: 20px; }
-    .blk-body { display: block !important; }
-    .detail { display: block !important; padding-left: 20px; }
-    .item { page-break-inside: avoid; border-top: 1px solid #999; }
-    .tape { border-right: 4px solid #333; }
+
+  /* ---------- Print ---------- */
+  @media print{
+    body{background:#fff;padding-bottom:0;font-size:12px}
+    .idbar,.filters,.detail textarea,.evidence-input,.acts,.toast{display:none !important}
+    .blk[data-open="false"] .blk-body{display:block}
+    .item{display:flex !important;break-inside:avoid}
+    .detail{display:block !important;padding-left:52px}
+    .empty{display:none}
+    header.mast{border-bottom:3px solid #000}
+    .blk,.dash{box-shadow:none}
+    .blk-h{cursor:default}
+    a{color:inherit;text-decoration:none}
   }
 </style>
 </head>
@@ -157,18 +183,15 @@
       <h1>AS 5131 Site Audit — Sun Metals</h1>
       <div class="sub">Live close-out tracker. Copy and paste network file paths or shared drive links as verification evidence. Use the Filter options below to filter specific views, then hit "Print Report".</div>
     </div>
-    <div class="countdown">
-      <span class="n" id="cdN">—</span>
-      <span class="l" id="cdL">to audit</span>
-    </div>
+    <div class="countdown"><span class="n" id="cdN">—</span><span class="l" id="cdL">to audit</span></div>
   </div>
 </header>
 
 <div class="idbar">
   <div class="wrap idbar-in">
-    <label for="who" class="who">Your name</label>
-    <input id="who" placeholder="e.g. Brad W" autocomplete="off">
-    <span class="who" id="whoNote">Everyone sharing this link sees the same entries.</span>
+    <label for="who">Your name</label>
+    <input id="who" autocomplete="name" placeholder="e.g. Brad">
+    <span class="who" id="whoNote"></span>
     <span class="sync" id="sync">Loading…</span>
   </div>
 </div>
@@ -202,17 +225,29 @@
 </main>
 
 <footer class="wrap">
-  <b>DAW-TSV-CHK-001 · Rev 1</b> — clause references verified against AS/NZS 5131:2016.<br>
+  <b>DAW-TSV-CHK-001 · Rev 2</b> — clause references verified against AS/NZS 5131:2016. Single-key sync with merge-safe saves.<br>
   Entries are shared with everyone who has this link. Don't put anything in here you wouldn't hand to the auditor.
 </footer>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const BUCKET = 'as5131-sunmetals-dawsons-2026'; 
+const BUCKET = 'as5131-sunmetals-dawsons-2026';
 const API_URL = `https://kvdb.io/MN94Xg41mX74m8Z5aP5JvC/${BUCKET}`;
+/* Rev 2: all entries live under ONE key instead of 125 — one fetch per refresh.
+   Saves use read-merge-write with verification retries so two people saving
+   at the same moment cannot wipe each other's entries. */
+const KEY_URL = `${API_URL}-all`;
 const NAMEKEY = 'as5131-my-name';
 const AUDIT = new Date('2026-07-16T08:00:00+10:00');
+
+/* Status labels — this object was missing in Rev 1 and crashed the page on load */
+const LABEL = {
+  open: 'Not started',
+  progress: 'In progress',
+  hold: 'On hold',
+  closed: 'Closed'
+};
 
 const DATA = [
  {n:'1', t:'Construction Category — settle this first', note:'The CC (CC1–CC4) drives nearly everything else. It is a risk-based classification from Appendix C and must come off the Sun Metals construction specification. It is NOT the same as the Dawsons Project Category in IMS010 6.3.', items:[
@@ -408,46 +443,108 @@ function logOf(ref){
 
 const ALL = DATA.flatMap(s => s.items.map(i => ({...i, sec:s.n})));
 
-async function load(){
+/* ---------- Rev 2 storage: one key, merge-safe ---------- */
+
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+/* Fetch the whole shared state in ONE request.
+   Returns: entries object, or 'missing' (key not created yet), or null (network error). */
+async function fetchAll(){
   try {
-    const promises = ALL.map(async (item) => {
-      try {
-        const r = await fetch(`${API_URL}-${item.r}`);
-        if (r.ok) {
-          const val = await r.json();
-          if (val && val.logs) {
-            STATE.entries[item.r] = val.logs;
-          }
-        }
-      } catch (e) {}
-    });
-    await Promise.all(promises);
-  } catch(e) {}
+    const r = await fetch(KEY_URL);
+    if (r.status === 404) return 'missing';
+    if (!r.ok) return null;
+    const val = await r.json();
+    return (val && val.logs) ? val.logs : 'missing';
+  } catch(e){
+    return null;
+  }
 }
 
-async function pushEntry(ref, entry){
-  if (!STATE.entries[ref]) STATE.entries[ref] = [];
-  
-  let localLogs = [];
-  try {
-    const r = await fetch(`${API_URL}-${ref}`);
-    if (r.ok) {
-      const remoteData = await r.json();
-      if (remoteData && remoteData.logs) {
-        localLogs = remoteData.logs;
-      }
-    }
-  } catch(e) {}
-
-  localLogs.push(entry);
-  STATE.entries[ref] = localLogs;
-
-  await fetch(`${API_URL}-${ref}`, {
+async function postAll(){
+  const r = await fetch(KEY_URL, {
     method: 'POST',
     mode: 'cors',
-    body: JSON.stringify({ logs: localLogs }),
+    body: JSON.stringify({ logs: STATE.entries, savedAt: new Date().toISOString() }),
     headers: { 'Content-Type': 'application/json' }
   });
+  if (!r.ok) throw new Error('post-failed');
+}
+
+/* Merge two entry arrays. Every entry has a unique random id, so a simple
+   union-by-id means nobody's entry can ever be lost in a merge — if Brad and
+   Joel both save at once, the merged list contains both entries. */
+function mergeEntries(a, b){
+  const map = {};
+  [...(a || []), ...(b || [])].forEach(e => { if (e && e.id) map[e.id] = e; });
+  return Object.values(map).sort((x, y) => String(x.ts).localeCompare(String(y.ts)));
+}
+
+/* Merge the remote state into local — union per item, never discard. */
+function mergeStates(remote){
+  const out = {};
+  const refs = new Set([...Object.keys(STATE.entries), ...Object.keys(remote || {})]);
+  refs.forEach(r => { out[r] = mergeEntries(STATE.entries[r], remote ? remote[r] : null); });
+  return out;
+}
+
+/* One-time migration: pull any entries saved under the old Rev 1 per-item keys
+   so nothing already logged is lost, then fold them into the single key. */
+async function legacyLoad(){
+  const promises = ALL.map(async (item) => {
+    try {
+      const r = await fetch(`${API_URL}-${item.r}`);
+      if (r.ok) {
+        const val = await r.json();
+        if (val && val.logs) STATE.entries[item.r] = mergeEntries(STATE.entries[item.r], val.logs);
+      }
+    } catch (e) {}
+  });
+  await Promise.all(promises);
+}
+
+async function load(){
+  const remote = await fetchAll();
+  if (remote === null) return;                       // network error — keep what we have
+  if (remote !== 'missing'){ STATE.entries = mergeStates(remote); return; }
+  await legacyLoad();                                // first run on Rev 2: migrate old data
+  if (Object.keys(STATE.entries).length){
+    try { await postAll(); } catch(e) {}
+  }
+}
+
+/* SAFEGUARD: read-merge-write with verification.
+   1. Add the entry locally.
+   2. Read the latest server copy and MERGE it in (so a teammate's save made a
+      moment ago is preserved).
+   3. Write the merged set back.
+   4. Wait a beat, re-read, and CHECK our entry actually landed. If someone
+      else's write overlapped ours and clobbered it, merge and write again —
+      up to 4 attempts with staggered random delays so two colliding browsers
+      stop tripping over each other. */
+async function pushEntry(ref, entry){
+  if (!STATE.entries[ref]) STATE.entries[ref] = [];
+  STATE.entries[ref] = mergeEntries(STATE.entries[ref], [entry]);
+
+  for (let attempt = 0; attempt < 4; attempt++){
+    if (attempt) await sleep(300 + Math.random() * 600);
+
+    const remote = await fetchAll();
+    if (remote !== null && remote !== 'missing') STATE.entries = mergeStates(remote);
+
+    try { await postAll(); } catch(e){ continue; }
+
+    await sleep(350 + Math.random() * 350);
+    const check = await fetchAll();
+    if (check !== null && check !== 'missing'){
+      STATE.entries = mergeStates(check);
+      const landed = (check[ref] || []).some(e => e.id === entry.id);
+      if (landed) return;                            // confirmed on the server
+    } else if (check === null && attempt === 3) {
+      break;                                         // network gone — give up loudly
+    }
+  }
+  throw new Error('save-not-confirmed');
 }
 
 async function refresh(silent){
@@ -525,7 +622,7 @@ function buildInitialUI(){
       <span class="blk-n">${sec.n}</span>
       <span class="blk-t">${sec.t}</span>
       <span class="blk-c" id="sec-counter-${sec.n}">0/0 closed</span>`;
-    h.onclick = () => { 
+    h.onclick = () => {
       if (OPEN.has(sec.n)) {
         OPEN.delete(sec.n);
         blk.dataset.open = 'false';
@@ -540,11 +637,11 @@ function buildInitialUI(){
 
     const body = el('div', 'blk-body');
     if (sec.note){ const n = el('div','note'); n.textContent = sec.note; body.appendChild(n); }
-    
+
     sec.items.forEach(item => {
       body.appendChild(createItemRowDOM(item));
     });
-    
+
     blk.appendChild(body);
     list.appendChild(blk);
   });
@@ -580,7 +677,7 @@ function createItemRowDOM(i){
   inner.appendChild(top);
 
   const d = el('div', 'detail');
-  
+
   const logContainer = el('div');
   logContainer.id = `log-container-${i.r}`;
   d.appendChild(logContainer);
@@ -597,7 +694,8 @@ function createItemRowDOM(i){
 
   const acts = el('div', 'acts');
   acts.id = `acts-container-${i.r}`;
-  
+
+  // Appends static control set dynamically managed by updateUIIncremental
   d.appendChild(acts);
   inner.appendChild(d);
   row.appendChild(inner);
@@ -606,7 +704,7 @@ function createItemRowDOM(i){
 
 function updateUIIncremental(){
   stats();
-  
+
   DATA.forEach(sec => {
     let closedCount = 0;
     let openCritCount = 0;
@@ -618,21 +716,23 @@ function updateUIIncremental(){
 
       const row = $(`#item-row-${i.r}`);
       if (!row) return;
-      
+
       row.dataset.s = s;
-      
+
+      // Update badge label text dynamically
       $(`#pill-badge-${i.r}`).textContent = LABEL[s];
-      
+
+      // Update history notes array log trail safely without replacing input elements
       const logs = logOf(i.r);
       const logContainer = $(`#log-container-${i.r}`);
       $(`#clause-text-${i.r}`).innerHTML = `${esc(i.k)}${logs.length ? ` &nbsp;·&nbsp; ${logs.length} ${logs.length===1?'entry':'entries'}` : ''}`;
-      
+
       if (logContainer) {
         if (logs.length) {
           let html = '<ul class="log">';
           logs.forEach(e => {
             const when = new Date(e.ts).toLocaleString([], {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-            let evidenceMarkup = e.evidenceLink ? `<div class="evidence-tag">📄 Evidence Link: <a href="${esc(e.evidenceLink)}" target="_blank">${esc(e.evidenceLink)}</a></div>` : '';
+            let evidenceMarkup = e.evidenceLink ? `<div class="evidence-tag">📄 Evidence Link: <a href="${esc(e.evidenceLink)}" target="_blank" rel="noopener">${esc(e.evidenceLink)}</a></div>` : '';
             html += `<li class="${e.status ? 's-' + e.status : ''}">
               <div class="meta"><b>${esc(e.who)}</b> · ${when}${e.status ? ' · → ' + LABEL[e.status] : ''}</div>
               <div class="body">${esc(e.text)}</div>${evidenceMarkup}
@@ -645,6 +745,7 @@ function updateUIIncremental(){
         }
       }
 
+      // Update button layout configurations without replacing parent elements
       const acts = $(`#acts-container-${i.r}`);
       const ta = $(`#textarea-${i.r}`);
       if (acts && ta) {
@@ -666,17 +767,20 @@ function updateUIIncremental(){
         }
       }
 
+      // Filter processing rule visibility execution
       let visibleByFilter = true;
       if (FILTER === 'crit' && !i.c) visibleByFilter = false;
       if (FILTER !== 'all' && FILTER !== 'crit' && s !== FILTER) visibleByFilter = false;
       row.style.display = visibleByFilter ? 'flex' : 'none';
     });
 
+    // Update Category Section Header Counters layout fields dynamically
     const counterSpan = $(`#sec-counter-${sec.n}`);
     if (counterSpan) {
       counterSpan.innerHTML = `${closedCount}/${sec.items.length} closed${openCritCount ? ` · <b>${openCritCount} critical open</b>` : ''}`;
     }
-    
+
+    // Hide empty block sets matching active filter rules layout constraints
     const blk = $(`#sec-block-${sec.n}`);
     if (blk) {
       const currentVisibleItems = sec.items.filter(i => {
@@ -698,29 +802,29 @@ function createActionBtn(i, cls, label, targetStatus) {
     const elink = $(`#evidence-${i.r}`);
     const text = ta.value.trim();
     const evidenceLink = elink ? elink.value.trim() : '';
-    
-    if (!ME){ 
-      alert("Please enter your name in the top bar first, then save your work!"); 
-      $('#who').focus(); 
-      return; 
+
+    if (!ME){
+      alert("Please enter your name in the top bar first, then save your work!");
+      $('#who').focus();
+      return;
     }
-    
+
     if (text.length < 4){
       toast(targetStatus === 'closed' ? 'Type what was actioned or validated before closing' : 'Write a line saying what is happening', true);
       if (ta) ta.focus();
       return;
     }
-    
+
     if (b.disabled) return;
-    
+
     const blockContext = $(`#acts-container-${i.r}`);
     const activeControlSet = blockContext.querySelectorAll('button');
     activeControlSet.forEach(x => x.disabled = true);
-    
+
     const prevSyncText = $('#sync').textContent;
     $('#sync').textContent = 'Saving to Server…';
     $('#sync').classList.add('on');
-    
+
     try {
       await pushEntry(i.r, {
         id: Math.random().toString(36).slice(2) + Date.now().toString(36),
@@ -736,7 +840,7 @@ function createActionBtn(i, cls, label, targetStatus) {
       if (elink) elink.value = '';
       await refresh(true);
     } catch(err){
-      alert("Network Error: The storage server dropped the request. Try saving again!");
+      alert("Save could not be confirmed on the server after several attempts. Your entry is still on THIS screen — check your connection and hit the button again.");
     } finally {
       activeControlSet.forEach(x => x.disabled = false);
       $('#sync').textContent = prevSyncText;
@@ -759,22 +863,22 @@ $('#filters').addEventListener('click', e => {
   updateUIIncremental();
 });
 
-$('#expandAll').onclick = () => { 
+$('#expandAll').onclick = () => {
   DATA.forEach(s => {
     OPEN.add(s.n);
     const blk = $(`#sec-block-${s.n}`);
     if (blk) blk.dataset.open = 'true';
-  }); 
-  updateUIIncremental(); 
+  });
+  updateUIIncremental();
 };
 
-$('#collapseAll').onclick = () => { 
-  OPEN.clear(); 
+$('#collapseAll').onclick = () => {
+  OPEN.clear();
   DATA.forEach(s => {
     const blk = $(`#sec-block-${s.n}`);
     if (blk) blk.dataset.open = 'false';
   });
-  updateUIIncremental(); 
+  updateUIIncremental();
 };
 
 $('#printReportButton').onclick = () => { window.print(); };
