@@ -358,7 +358,7 @@ const DATA = [
   {r:'16.1',c:1, x:'Identification visible after surface preparation and after painting or galvanizing', k:'Cl 6.2; 9.2.4'},
   {r:'16.2',c:1, x:'75 mm wide weld margin left uncoated at site welds and masked', k:'Cl 9.9.9'},
   {r:'16.3',c:0, x:'Traceability back to mill test certificates maintained', k:'Cl 4.7; 6.2'},
-  {r:'16.4',c:0, x:'Steel stored on dunnage, clear of the ground, protected from coating abrasion', k:'Cl 9.9.19; 11.5.6'},
+  {r:'16.4',c:0, x:'Steel store on dunnage, clear of the ground, protected from coating abrasion', k:'Cl 9.9.19; 11.5.6'},
   {r:'16.5',c:0, x:'Damage to painted or galvanized surfaces repaired per Cl 9.12', k:'Cl 11.5.6'}
  ]},
  {n:'17', t:'Safety of the works & PPE', items:[
@@ -389,6 +389,7 @@ const el = (t, c) => { const e = document.createElement(t); if (c) e.className =
 
 function toast(msg, err){
   const t = $('#toast');
+  if(!t) return;
   t.textContent = msg;
   t.className = 'toast up' + (err ? ' err' : '');
   clearTimeout(t._x);
@@ -417,7 +418,6 @@ async function load(){
         STATE = val;
       }
     } else if (r.status === 404) {
-      // Auto-initialize bucket if it doesn't exist yet!
       await initializeDatabase();
     }
   } catch(e) {}
@@ -431,10 +431,7 @@ async function initializeDatabase() {
       body: JSON.stringify({ entries: {} }),
       headers: { 'Content-Type': 'application/json' }
     });
-    console.log("Database initialized successfully.");
-  } catch(e) {
-    console.error("Failed to auto-initialize database.");
-  }
+  } catch(e) {}
 }
 
 async function pushEntry(ref, entry){
@@ -496,7 +493,6 @@ function saveName(v){
   updateNameNote();
   localStorage.setItem(NAMEKEY, ME);
   render();
-  // Ensure database wakes up when name is typed
   load();
 }
 function updateNameNote(){
@@ -648,7 +644,13 @@ function itemRow(i){
     b.onclick = async () => {
       const text = ta.value.trim();
       const evidenceLink = elink.value.trim();
-      if (!ME){ toast('Put your name in the bar at the top first', true); $('#who').focus(); return; }
+      
+      if (!ME){ 
+        alert("Please enter your name in the top bar first, then save your work!"); 
+        $('#who').focus(); 
+        return; 
+      }
+      
       if (text.length < 4){
         toast(status === 'closed' ? 'Type what was actioned or validated before closing' : 'Write a line saying what is happening', true);
         ta.focus();
