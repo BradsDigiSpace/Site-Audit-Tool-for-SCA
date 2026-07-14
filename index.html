@@ -410,65 +410,56 @@ const ALL = DATA.flatMap(s => s.items.map(i => ({...i, sec:s.n})));
 
 async function load(){
   try {
-    const r = await fetch(API_URL);
-    if (r.ok) {
-      const val = await r.json();
-      if (val && val.entries) {
-        STATE = val;
-      }
-    } else if (r.status === 404) {
-      await initializeDatabase();
-    }
-  } catch(e) {}
-  if (!STATE.entries) STATE.entries = {};
-}
-
-async function initializeDatabase() {
-  try {
-    await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ entries: {} }),
-      headers: { 'Content-Type': 'application/json' }
+    // Fetch individual records from separate keys to build the combined state view
+    const promises = ALL.map(async (item) => {
+      try {
+        const r = await fetch(`${API_URL}-${item.r}`);
+        if (r.ok) {
+          const val = await r.json();
+          if (val && val.logs) {
+            STATE.entries[item.r] = val.logs;
+          }
+        }
+      } catch (e) {}
     });
+    await Promise.all(promises);
+    render();
   } catch(e) {}
 }
 
 async function pushEntry(ref, entry){
-  let latest = { entries:{} };
+  if (!STATE.entries[ref]) STATE.entries[ref] = [];
+  
+  // Pull just this item's specific live remote trail first
+  let localLogs = [];
   try {
-    const r = await fetch(API_URL);
+    const r = await fetch(`${API_URL}-${ref}`);
     if (r.ok) {
-      latest = await r.json();
-    }
-  } catch(e) {}
-  if (!latest.entries) latest.entries = {};
-
-  if(!latest.entries[ref]) latest.entries[ref] = [];
-  latest.entries[ref].push(entry);
-  latest.updated = new Date().toISOString();
-
-  await fetch(API_URL, {
-    method: 'POST',
-    mode: 'cors',
-    body: JSON.stringify(latest),
-    headers: { 'Content-Type': 'application/json' }
-  });
-  STATE = latest;
-}
-
-async function refresh(silent){
-  try {
-    const r = await fetch(API_URL);
-    if (r.ok) {
-      const next = await r.json();
-      if (JSON.stringify(next) !== JSON.stringify(STATE)) {
-        STATE = next;
-        if (!STATE.entries) STATE.entries = {};
-        render();
-        if (!silent) toast('Updated from the team');
+      const remoteData = await r.json();
+      if (remoteData && remoteData.logs) {
+        localLogs = remoteData.logs;
       }
     }
   } catch(e) {}
+
+  localLogs.push(entry);
+  STATE.entries[ref] = localLogs;
+
+  // Push directly to its own isolated safe storage path
+  await fetch(`${API_URL}-${ref}`, {
+    method: 'POST',
+    mode: 'cors',
+    body: JSON.stringify({ logs: localLogs }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+async function refresh(silent){
+  const previousState = JSON.stringify(STATE.entries);
+  await load();
+  if (JSON.stringify(STATE.entries) !== previousState && !silent) {
+    toast('Updated from the team');
+  }
   markSynced();
 }
 
@@ -490,7 +481,6 @@ function saveName(v){
   updateNameNote();
   localStorage.setItem(NAMEKEY, ME);
   render();
-  load();
 }
 function updateNameNote(){
   $('#whoNote').textContent = ME
@@ -654,7 +644,8 @@ function itemRow(i){
         return;
       }
       
-      // Select all button elements to deactivate them
+      if (b.disabled) return;
+      
       const trackingButtons = acts.querySelectorAll('button');
       trackingButtons.forEach(x => x.disabled = true);
       const prevSyncText = $('#sync').textContent;
@@ -741,7 +732,7 @@ $('#who').addEventListener('input', e => {
   OPEN.add('1'); OPEN.add('2');
   render();
   markSynced();
-  setInterval(() => refresh(true), 10000);
+  setInterval(() => refresh(true), 12000);
   window.addEventListener('focus', () => refresh(true));
 })();
 </script>
