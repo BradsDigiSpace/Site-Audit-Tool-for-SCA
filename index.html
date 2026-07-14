@@ -225,7 +225,7 @@
 </main>
 
 <footer class="wrap">
-  <b>DAW-TSV-CHK-001 · Rev 2</b> — clause references verified against AS/NZS 5131:2016. Single-key sync with merge-safe saves.<br>
+  <b>DAW-TSV-CHK-001 · Rev 3</b> — clause references verified against AS/NZS 5131:2016. Single-key sync with merge-safe saves.<br>
   Entries are shared with everyone who has this link. Don't put anything in here you wouldn't hand to the auditor.
 </footer>
 
@@ -419,6 +419,10 @@ let FILTER = 'all';
 let OPEN = new Set();
 
 const $ = s => document.querySelector(s);
+/* Item refs like "1.1" contain dots, which are ILLEGAL inside a CSS #id selector
+   ("#item-row-1.1" throws). getElementById accepts dots fine, so all dynamic
+   ID lookups must go through byId, never through $. */
+const byId = id => document.getElementById(id);
 const el = (t, c) => { const e = document.createElement(t); if (c) e.className = c; return e; };
 
 function toast(msg, err){
@@ -714,18 +718,18 @@ function updateUIIncremental(){
       if (s === 'closed') closedCount++;
       if (i.c && s !== 'closed') openCritCount++;
 
-      const row = $(`#item-row-${i.r}`);
+      const row = byId(`item-row-${i.r}`);
       if (!row) return;
 
       row.dataset.s = s;
 
       // Update badge label text dynamically
-      $(`#pill-badge-${i.r}`).textContent = LABEL[s];
+      byId(`pill-badge-${i.r}`).textContent = LABEL[s];
 
       // Update history notes array log trail safely without replacing input elements
       const logs = logOf(i.r);
-      const logContainer = $(`#log-container-${i.r}`);
-      $(`#clause-text-${i.r}`).innerHTML = `${esc(i.k)}${logs.length ? ` &nbsp;·&nbsp; ${logs.length} ${logs.length===1?'entry':'entries'}` : ''}`;
+      const logContainer = byId(`log-container-${i.r}`);
+      byId(`clause-text-${i.r}`).innerHTML = `${esc(i.k)}${logs.length ? ` &nbsp;·&nbsp; ${logs.length} ${logs.length===1?'entry':'entries'}` : ''}`;
 
       if (logContainer) {
         if (logs.length) {
@@ -746,8 +750,8 @@ function updateUIIncremental(){
       }
 
       // Update button layout configurations without replacing parent elements
-      const acts = $(`#acts-container-${i.r}`);
-      const ta = $(`#textarea-${i.r}`);
+      const acts = byId(`acts-container-${i.r}`);
+      const ta = byId(`textarea-${i.r}`);
       if (acts && ta) {
         acts.innerHTML = '';
         ta.placeholder = s === 'closed' ? 'Add a further note, or reopen with a reason…' : 'What was done, or what is happening?';
@@ -775,13 +779,13 @@ function updateUIIncremental(){
     });
 
     // Update Category Section Header Counters layout fields dynamically
-    const counterSpan = $(`#sec-counter-${sec.n}`);
+    const counterSpan = byId(`sec-counter-${sec.n}`);
     if (counterSpan) {
       counterSpan.innerHTML = `${closedCount}/${sec.items.length} closed${openCritCount ? ` · <b>${openCritCount} critical open</b>` : ''}`;
     }
 
     // Hide empty block sets matching active filter rules layout constraints
-    const blk = $(`#sec-block-${sec.n}`);
+    const blk = byId(`sec-block-${sec.n}`);
     if (blk) {
       const currentVisibleItems = sec.items.filter(i => {
         const s = statusOf(i.r);
@@ -798,8 +802,8 @@ function createActionBtn(i, cls, label, targetStatus) {
   const b = el('button', 'btn ' + cls);
   b.textContent = label;
   b.onclick = async () => {
-    const ta = $(`#textarea-${i.r}`);
-    const elink = $(`#evidence-${i.r}`);
+    const ta = byId(`textarea-${i.r}`);
+    const elink = byId(`evidence-${i.r}`);
     const text = ta.value.trim();
     const evidenceLink = elink ? elink.value.trim() : '';
 
@@ -817,7 +821,7 @@ function createActionBtn(i, cls, label, targetStatus) {
 
     if (b.disabled) return;
 
-    const blockContext = $(`#acts-container-${i.r}`);
+    const blockContext = byId(`acts-container-${i.r}`);
     const activeControlSet = blockContext.querySelectorAll('button');
     activeControlSet.forEach(x => x.disabled = true);
 
@@ -866,7 +870,7 @@ $('#filters').addEventListener('click', e => {
 $('#expandAll').onclick = () => {
   DATA.forEach(s => {
     OPEN.add(s.n);
-    const blk = $(`#sec-block-${s.n}`);
+    const blk = byId(`sec-block-${s.n}`);
     if (blk) blk.dataset.open = 'true';
   });
   updateUIIncremental();
@@ -875,7 +879,7 @@ $('#expandAll').onclick = () => {
 $('#collapseAll').onclick = () => {
   OPEN.clear();
   DATA.forEach(s => {
-    const blk = $(`#sec-block-${s.n}`);
+    const blk = byId(`sec-block-${s.n}`);
     if (blk) blk.dataset.open = 'false';
   });
   updateUIIncremental();
@@ -894,6 +898,7 @@ $('#who').addEventListener('input', e => {
   setInterval(countdown, 60000);
   loadName();
   await load();
+  markSynced();
   OPEN.add('1'); OPEN.add('2'); OPEN.add('3');
   buildInitialUI();
   setInterval(() => refresh(true), 12000);
